@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
+echo "GREG TEST MESSAGE"
+tree /runpod-volume/
+
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
-
-echo "GREG TEST MESSAGE"
-tree /runpod-volume/
 
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
