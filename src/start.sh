@@ -3,24 +3,24 @@
 echo ""
 echo "======================================== VOLUME FILES ===="
 echo ""
-ls -1 -d /runpod-volume/ /**/*
+ls -1 -d /runpod-volume/**/*
 echo ""
 echo "======================================== ENDS ===="
 echo ""
 
-mkdir /ComfyUI/comfyui/models/checkpoints
+mkdir /comfyui/models/checkpoints
 ln -sf /runpod-volume/models/checkpoints/* /ComfyUI/comfyui/models/checkpoints
-mkdir /ComfyUI/comfyui/models/unet
+mkdir /comfyui/models/unet
 ln -sf /runpod-volume/models/unet/* /ComfyUI/comfyui/models/unet
-mkdir /ComfyUI/comfyui/models/clip
+mkdir /comfyui/models/clip
 ln -sf /runpod-volume/models/clip/* /ComfyUI/comfyui/models/clip
-mkdir /ComfyUI/comfyui/models/vae
+mkdir /comfyui/models/vae
 ln -sf /runpod-volume/models/vae/* /ComfyUI/comfyui/models/vae
 
 echo ""
 echo "======================================== COMFY FILES ===="
 echo ""
-ls -1 -d /comfyui/ /**/*
+ls -1 -d /comfyui/**/*
 echo ""
 echo "======================================== ENDS ===="
 echo ""
