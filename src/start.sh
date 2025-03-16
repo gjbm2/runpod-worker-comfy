@@ -12,7 +12,7 @@ mkdir -p /comfyui/models/checkpoints
 ln -sf /runpod-volume/models/checkpoints/* /comfyui/models/checkpoints
 ls -l /comfyui/models/checkpoints
 mkdir -p /comfyui/models/unet
-ln -sf /runpod-volume/imodels/unet/* /comfyui/models/unet
+ln -sf /runpod-volume/models/unet/* /comfyui/models/unet
 ls -l /comfyui/models/unet
 mkdir -p /comfyui/models/clip
 ln -sf /runpod-volume/models/clip/* /comfyui/models/clip
