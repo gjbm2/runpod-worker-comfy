@@ -8,19 +8,24 @@ echo ""
 echo "======================================== ENDS ===="
 echo ""
 
-mkdir /comfyui/models/checkpoints
+mkdir -p /comfyui/models/checkpoints
 ln -sf /runpod-volume/models/checkpoints/* /comfyui/models/checkpoints
-mkdir /comfyui/models/unet
-ln -sf /runpod-volume/models/unet/* /comfyui/models/unet
-mkdir /comfyui/models/clip
+ls -l /comfyui/models/checkpoints
+mkdir -p /comfyui/models/unet
+ln -sf /runpod-volume/imodels/unet/* /comfyui/models/unet
+ls -l /comfyui/models/unet
+mkdir -p /comfyui/models/clip
 ln -sf /runpod-volume/models/clip/* /comfyui/models/clip
-mkdir /comfyui/models/vae
+ls -l /comfyui/models/clip
+mkdir -p /comfyui/models/vae
 ln -sf /runpod-volume/models/vae/* /comfyui/models/vae
+ls -l /comfyui/models/vae
 
 echo ""
 echo "======================================== COMFY FILES ===="
 echo ""
 find /comfyui/ -type f
+find /comfyui/ -type l -exec ls -l {} +
 echo ""
 echo "======================================== ENDS ===="
 echo ""
