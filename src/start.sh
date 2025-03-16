@@ -3,7 +3,10 @@
 echo ""
 echo "======================================== START.SH"
 echo ""
-
+find "$PWD" -type f | sort && \
+echo ""
+echo "======================================== "
+echo ""
 
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
