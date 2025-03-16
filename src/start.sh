@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "GREG TEST MESSAGE"
-tree /runpod-volume/
+ls -R /runpod-volume/
 
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
