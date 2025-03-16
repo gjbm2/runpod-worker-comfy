@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
 echo ""
-echo "======================================== START.SH"
+echo "======================================== COMFY FILES ====
 echo ""
-ls -1 -d "$PWD"/* "$PWD"/**/* 
+ls -1 -d /comfyui/ /**/*
 echo ""
-echo "======================================== "
+echo "======================================== VOLUME FILES ===="
+ls -1 -d /runpod-volume/ /**/*
 echo ""
+echo "======================================== ENDS ===="
 
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
