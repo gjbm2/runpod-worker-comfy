@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-which aws
-export PATH=$HOME/.local/bin:$PATH
 echo "Try to sync S3"
 export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
