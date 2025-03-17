@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+echo "Try to sync S3"
+export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
+export AWS_DEFAULT_REGION="$BUCKET_AWS_REGION"
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models
+
 echo ""
 echo "======================================== VOLUME FILES ===="
 echo ""
