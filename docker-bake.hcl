@@ -1,5 +1,5 @@
 variable "DOCKERHUB_REPO" {
-  default = "timpietruskyblibla"
+  default = "gjbm2"
 }
 
 variable "DOCKERHUB_IMG" {
