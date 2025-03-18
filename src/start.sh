@@ -35,8 +35,8 @@ find "$SRC" -type f ! -exec test -e "$DEST/$(realpath --relative-to="$SRC" "{}")
 
 #find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
 #find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
-find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom_nodes/{} \;
-find /runpod-volume/custom_nodes/ -type f ! -exec test -e /comfyui/custom_nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
+#find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom_nodes/{} \;
+#find /runpod-volume/custom_nodes/ -type f ! -exec test -e /comfyui/custom_nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
 
 #ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
 #ln -sf /runpod-volume/models/* /comfyui/models
