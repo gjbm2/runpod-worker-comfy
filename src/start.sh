@@ -25,35 +25,35 @@ echo ""
 ## Create symlinks for missing files (relative paths)
 #find "$SRC" -type f ! -exec test -e "$DEST/$(realpath --relative-to="$SRC" "{}")" \; -exec ln -s "{}" "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
 
-#SRC="/runpod-volume/custom_nodes"
-#DEST="/comfyui/custom_nodes"
-## Create missing directories
-#find "$SRC" -type d -exec mkdir -p "$DEST/{}" \;
-## Create symlinks for missing files (relative paths)
-#find "$SRC" -type f ! -exec test -e "$DEST/$(realpath --relative-to="$SRC" "{}")" \; -exec ln -s "{}" "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
-
+SRC="/runpod-volume/custom_nodes"
+DEST="/comfyui/custom_nodes"
+# Create missing directories
+find "$SRC" -type d -exec mkdir -p "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
+# Create symlinks for missing or outdated files
+find "$SRC" -type f -exec ln -sf "{}" "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
 
 #find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
 #find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
 #find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom_nodes/{} \;
 #find /runpod-volume/custom_nodes/ -type f ! -exec test -e /comfyui/custom_nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
 
-ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
-ln -sf /runpod-volume/models/* /comfyui/models
+#ln -s /runpod-volume/custom_nodes/* /comfyui/custom_nodes
+
+ln -s /runpod-volume/models/* /comfyui/models
 mkdir -p /comfyui/models/checkpoints
-ln -sf /runpod-volume/models/checkpoints/* /comfyui/models/checkpoints
+ln -s /runpod-volume/models/checkpoints/* /comfyui/models/checkpoints
 ls -l /comfyui/models/checkpoints
 mkdir -p /comfyui/models/unet
-ln -sf /runpod-volume/models/unet/* /comfyui/models/unet
+ln -s /runpod-volume/models/unet/* /comfyui/models/unet
 ls -l /comfyui/models/unet
 mkdir -p /comfyui/models/clip
-ln -sf /runpod-volume/models/clip/* /comfyui/models/clip
+ln -s /runpod-volume/models/clip/* /comfyui/models/clip
 ls -l /comfyui/models/clip
 mkdir -p /comfyui/models/vae
-ln -sf /runpod-volume/models/vae/* /comfyui/models/vae
+ln -s /runpod-volume/models/vae/* /comfyui/models/vae
 ls -l /comfyui/models/vae
 mkdir -p /comfyui/models/loras
-ln -sf /runpod-volume/models/loras/* /comfyui/models/loras
+ln -s /runpod-volume/models/loras/* /comfyui/models/loras
 ls -l /comfyui/models/loras
 
 echo ""
