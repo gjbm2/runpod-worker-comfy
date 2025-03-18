@@ -6,9 +6,9 @@ echo
 export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
 export AWS_DEFAULT_REGION="$BUCKET_AWS_REGION"
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes
-# aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models --no-progress
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes --no-progress
+# aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots --no-progress
 
 echo ""
 echo "======================================== VOLUME FILES ===="
@@ -18,8 +18,23 @@ echo ""
 echo "======================================== ENDS ===="
 echo ""
 
-find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
-find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
+SRC="/runpod-volume/models"
+DEST="/comfyui/models"
+# Create missing directories
+find "$SRC" -type d -exec mkdir -p "$DEST/{}" \;
+# Create symlinks for missing files (relative paths)
+find "$SRC" -type f ! -exec test -e "$DEST/$(realpath --relative-to="$SRC" "{}")" \; -exec ln -s "{}" "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
+
+SRC="/runpod-volume/custom_nodes"
+DEST="/comfyui/custom_nodes"
+# Create missing directories
+find "$SRC" -type d -exec mkdir -p "$DEST/{}" \;
+# Create symlinks for missing files (relative paths)
+find "$SRC" -type f ! -exec test -e "$DEST/$(realpath --relative-to="$SRC" "{}")" \; -exec ln -s "{}" "$DEST/$(realpath --relative-to="$SRC" "{}")" \;
+
+
+#find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
+#find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
 find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom_nodes/{} \;
 find /runpod-volume/custom_nodes/ -type f ! -exec test -e /comfyui/custom_nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
 
