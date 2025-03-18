@@ -15,8 +15,14 @@ echo ""
 echo "======================================== ENDS ===="
 echo ""
 
-ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
-ln -sf /runpod-volume/models/* /comfyui/models
+find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
+find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
+find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom nodes/{} \;
+find /runpod-volume/custom nodes/ -type f ! -exec test -e /comfyui/custom nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
+
+
+#ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
+#ln -sf /runpod-volume/models/* /comfyui/models
 #mkdir -p /comfyui/models/checkpoints
 #ln -sf /runpod-volume/models/checkpoints/* /comfyui/models/checkpoints
 #ls -l /comfyui/models/checkpoints
