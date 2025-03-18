@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-echo "Try to sync S3..."
+echo 
+echo "======================================== AWS SYNC ===="
+echo 
 export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
 export AWS_DEFAULT_REGION="$BUCKET_AWS_REGION"
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models --quiet
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes --quiet
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes
+# aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots
 
 echo ""
 echo "======================================== VOLUME FILES ===="
@@ -17,9 +20,8 @@ echo ""
 
 find /runpod-volume/models/ -type d -exec mkdir -p /comfyui/models/{} \;
 find /runpod-volume/models/ -type f ! -exec test -e /comfyui/models/{} \; -exec ln -s {} /comfyui/models/{} \;
-find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom nodes/{} \;
-find /runpod-volume/custom nodes/ -type f ! -exec test -e /comfyui/custom nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
-
+find /runpod-volume/custom_nodes/ -type d -exec mkdir -p /comfyui/custom_nodes/{} \;
+find /runpod-volume/custom_nodes/ -type f ! -exec test -e /comfyui/custom_nodes/{} \; -exec ln -s {} /comfyui/custom nodes/{} \;
 
 #ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
 #ln -sf /runpod-volume/models/* /comfyui/models
