@@ -56,3 +56,4 @@ jobs:
             *.args.DOCKERHUB_IMG=${{ env.DOCKERHUB_IMG }}
             *.args.RELEASE_VERSION=${{ env.RELEASE_VERSION }}
             *.args.HUGGINGFACE_ACCESS_TOKEN=${{ env.HUGGINGFACE_ACCESS_TOKEN }}
+            *.args.MODEL_TYPE=base
