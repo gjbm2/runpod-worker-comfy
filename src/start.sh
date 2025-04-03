@@ -10,8 +10,10 @@ aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models --no
 aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes --no-progress
 # aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots --no-progress
 
-# copy them over for performance reasons...
-cp -v -uv -r /runpod-volume/models/* /comfyui/models/
+if [ "$COPY_SCRIPTS" == "true" ]; then
+    # copy them over for performance reasons...
+    cp -v -u -r /runpod-volume/models/* /comfyui/models/
+fi
 
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
