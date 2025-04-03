@@ -22,6 +22,9 @@ target "base" {
   context = "."
   dockerfile = "Dockerfile"
   target = "base"
+  args = {
+    MODEL_TYPE = "base"
+  }
   platforms = ["linux/amd64"]
   tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}-base"]
 }
