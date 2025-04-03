@@ -1,5 +1,5 @@
 variable "DOCKERHUB_REPO" {
-  default = "timpietruskyblibla"
+  default = "gjbm2"
 }
 
 variable "DOCKERHUB_IMG" {
@@ -15,7 +15,7 @@ variable "HUGGINGFACE_ACCESS_TOKEN" {
 }
 
 group "default" {
-  targets = ["base", "sdxl", "sd3", "flux1-schnell", "flux1-dev"]
+  targets = ["base", "sdxl", "sd35", "flux1-schnell", "flux1-dev"]
 }
 
 target "base" {
@@ -40,7 +40,7 @@ target "sdxl" {
   inherits = ["base"]
 }
 
-target "sd3" {
+target "sd35" {
   context = "."
   dockerfile = "Dockerfile"
   target = "final"
