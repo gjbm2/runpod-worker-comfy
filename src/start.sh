@@ -15,6 +15,9 @@ if [ "$COPY_SCRIPTS" == "true" ]; then
     cp -v -u -r /runpod-volume/models/* /comfyui/models/
 fi
 
+# pull in custom nodes
+ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes 
+
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
@@ -22,7 +25,7 @@ export LD_PRELOAD="${TCMALLOC}"
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
     echo "runpod-worker-comfy: Starting ComfyUI"
-    python3 /comfyui/main.py --disable-auto-launch --disable-metadata --listen &
+    python3 /comfyui/main.py --force-fp16 --disable-auto-launch --disable-metadata --listen &
 
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
