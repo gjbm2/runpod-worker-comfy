@@ -275,19 +275,19 @@ def process_output_images(outputs, job_id):
                 if matching_files:
                     # ✅ Pick the most recently modified file
                     latest_video = max(matching_files, key=os.path.getmtime)
-                        try:
-                            video_url = rp_upload.upload_file_to_bucket(
-                                file_name=video_filename,
-                                file_location=video_path,
-                                extra_args={"ContentType": mime}
-                            )
-                            print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
-                            return {
-                                "status": "success",
-                                "message": video_url
-                            }
-                        except Exception as e:
-                            print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
+                    try:
+                        video_url = rp_upload.upload_file_to_bucket(
+                            file_name=video_filename,
+                            file_location=video_path,
+                            extra_args={"ContentType": mime}
+                        )
+                        print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
+                        return {
+                            "status": "success",
+                            "message": video_url
+                        }
+                    except Exception as e:
+                        print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
         else:
             print("runpod-worker-comfy - S3 not configured, skipping video upload fallback.")
 
