@@ -52,12 +52,6 @@ WORKDIR /
 ADD src/start.sh src/restore_snapshot.sh src/rp_handler.py test_input.json ./
 RUN chmod +x /start.sh /restore_snapshot.sh
 
-# Optionally copy the snapshot file
-ADD *snapshot*.json /
-
-# Restore the snapshot to install custom nodes
-RUN /restore_snapshot.sh
-
 # Start container
 CMD ["/start.sh"]
 
@@ -106,6 +100,12 @@ FROM base as final
 
 # Copy models from stage 2 to the final image
 COPY --from=downloader /comfyui/models /comfyui/models
+
+# Optionally copy the snapshot file
+ADD *snapshot*.json /
+
+# Restore the snapshot to install custom nodes
+RUN /restore_snapshot.sh
 
 # Start container
 CMD ["/start.sh"]
