@@ -266,7 +266,29 @@ def process_output_images(outputs, job_id):
             "message": image,
         }
     else:
-        print("runpod-worker-comfy - the image does not exist in the output folder")
+        # If no image was found, try looking for a fallback video file
+        if os.environ.get("BUCKET_ENDPOINT_URL", False):
+            for video_filename, mime in [("output_video.webm", "video/webm"), ("output_video.webp", "image/webp")]:
+                video_path = os.path.join(COMFY_OUTPUT_PATH, video_filename)
+                if os.path.exists(video_path):
+                    try:
+                        video_url = rp_upload.upload_file_to_bucket(
+                            file_name=video_filename,
+                            file_location=video_path,
+                            extra_args={"ContentType": mime}
+                        )
+                        print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
+                        return {
+                            "status": "success",
+                            "message": video_url
+                        }
+                    except Exception as e:
+                        print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
+        else:
+            print("runpod-worker-comfy - S3 not configured, skipping video upload fallback.")
+
+        # Neither image nor video found
+        print("runpod-worker-comfy - an image does not exist in the output folder, or a video does not exist, or video & no S3 access")
         return {
             "status": "error",
             "message": f"the image does not exist in the specified output folder: {local_image_path}",
