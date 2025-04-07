@@ -5,6 +5,7 @@ import urllib.request
 import urllib.parse
 import time
 import os
+import glob
 import requests
 import base64
 from io import BytesIO
@@ -268,22 +269,25 @@ def process_output_images(outputs, job_id):
     else:
         # If no image was found, try looking for a fallback video file
         if os.environ.get("BUCKET_ENDPOINT_URL", False):
-            for video_filename, mime in [("output_video.webm", "video/webm"), ("output_video.webp", "image/webp")]:
-                video_path = os.path.join(COMFY_OUTPUT_PATH, video_filename)
-                if os.path.exists(video_path):
-                    try:
-                        video_url = rp_upload.upload_file_to_bucket(
-                            file_name=video_filename,
-                            file_location=video_path,
-                            extra_args={"ContentType": mime}
-                        )
-                        print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
-                        return {
-                            "status": "success",
-                            "message": video_url
-                        }
-                    except Exception as e:
-                        print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
+            for ext, mime in [("webm", "video/webm"), ("webp", "image/webp")]:
+                pattern = os.path.join(COMFY_OUTPUT_PATH, f"output_video*.{ext}")
+                matching_files = glob.glob(pattern)
+                if matching_files:
+                    # ✅ Pick the most recently modified file
+                    latest_video = max(matching_files, key=os.path.getmtime)
+                        try:
+                            video_url = rp_upload.upload_file_to_bucket(
+                                file_name=video_filename,
+                                file_location=video_path,
+                                extra_args={"ContentType": mime}
+                            )
+                            print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
+                            return {
+                                "status": "success",
+                                "message": video_url
+                            }
+                        except Exception as e:
+                            print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
         else:
             print("runpod-worker-comfy - S3 not configured, skipping video upload fallback.")
 
