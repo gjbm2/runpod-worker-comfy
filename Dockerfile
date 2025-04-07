@@ -101,6 +101,9 @@ FROM base as final
 # Copy models from stage 2 to the final image
 COPY --from=downloader /comfyui/models /comfyui/models
 
+# Go back to the root
+WORKDIR /
+
 # Optionally copy the snapshot file
 ADD *snapshot*.json /
 
