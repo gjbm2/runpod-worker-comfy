@@ -73,61 +73,146 @@ WORKDIR /comfyui
 # Create necessary directories
 RUN mkdir -p models/checkpoints models/vae models/clip_vision models/diffusion_models models/text_encoders
 
+
+
+
 # Download checkpoints/vae/LoRA to include in image based on model type
 # SDXL
-RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "sdxl" ]; then \
+    cp /models/checkpoints/sd_xl_base_1.0.safetensors models/checkpoints/sd_xl_base_1.0.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/checkpoints/sd_xl_base_1.0.safetensors https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors && \
+    cp /models/vae/sdxl_vae.safetensors models/vae/sdxl_vae.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/vae/sdxl_vae.safetensors https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors && \
+    cp /models/vae/sdxl-vae-fp16-fix.safetensors models/vae/sdxl-vae-fp16-fix.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/vae/sdxl-vae-fp16-fix.safetensors https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors; \
 fi
 
 # Wan 2.1
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "wan2" ]; then \
+    cp /models/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors models/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors; \
 fi
-# Wan 2.1
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "wan2" ]; then \
+    cp /models/diffusion_models/wan2.1_t2v_14B_fp16.safetensors models/diffusion_models/wan2.1_t2v_14B_fp16.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/diffusion_models/wan2.1_t2v_14B_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_t2v_14B_fp16.safetensors; \
 fi
-# Wan 2.1
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "wan2" ]; then \
+    cp /models/vae/wan_2.1_vae.safetensors models/vae/wan_2.1_vae.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/vae/wan_2.1_vae.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors; \
 fi
-# Wan 2.1
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "wan2" ]; then \
+    cp /models/clip_vision/clip_vision_h.safetensors models/clip_vision/clip_vision_h.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/clip_vision/clip_vision_h.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors; \
 fi
-# Wan 2.1
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "wan2" ]; then \
+    cp /models/text_encoders/umt5_xxl_fp16.safetensors models/text_encoders/umt5_xxl_fp16.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/text_encoders/umt5_xxl_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors; \
 fi
 
-
-
 # SD3.5
-RUN if [ "$MODEL_TYPE" = "sd35" ]; then \
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "sd35" ]; then \
+    cp /models/checkpoints/sd3.5_large.safetensors models/checkpoints/sd3.5_large.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/checkpoints/sd3.5_large.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/sd3.5_large.safetensors && \
+    cp /models/clip/t5xxl_fp16.safetensors models/clip/t5xxl_fp16.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/t5xxl_fp16.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/t5xxl_fp16.safetensors && \
+    cp /models/clip/clip_g.safetensors models/clip/clip_g.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/clip_g.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_g.safetensors && \
+    cp /models/clip/clip_l.safetensors models/clip/clip_l.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/clip_l.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_l.safetensors; \
 fi
 
 # FLUX 1 - Schnell
-RUN if [ "$MODEL_TYPE" = "flux1-schnell" ]; then \
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "flux1-schnell" ]; then \
+    cp /models/unet/flux1-schnell.safetensors models/unet/flux1-schnell.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/unet/flux1-schnell.safetensors https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors && \
+    cp /models/clip/clip_l.safetensors models/clip/clip_l.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/clip/clip_l.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors && \
+    cp /models/clip/t5xxl_fp8_e4m3fn.safetensors models/clip/t5xxl_fp8_e4m3fn.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/clip/t5xxl_fp8_e4m3fn.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors && \
+    cp /models/vae/ae.safetensors models/vae/ae.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors; \
 fi
 
 # FLUX 1 - Dev
-RUN if [ "$MODEL_TYPE" = "flux1" ]; then \
+RUN --mount=type=bind,source=/mnt/d/dev/models,target=/models \
+if [ "$MODEL_TYPE" = "flux1" ]; then \
+    cp /models/unet/flux1-dev.safetensors models/unet/flux1-dev.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/unet/flux1-dev.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors && \
+    cp /models/clip/clip_l.safetensors models/clip/clip_l.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/clip/clip_l.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors && \
+    cp /models/clip/t5xxl_fp8_e4m3fn.safetensors models/clip/t5xxl_fp8_e4m3fn.safetensors 2>/dev/null || \
     wget --progress=dot:giga -O models/clip/t5xxl_fp8_e4m3fn.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors && \
+    cp /models/vae/ae.safetensors models/vae/ae.safetensors 2>/dev/null || \
     wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors; \
 fi
 
+
+#
+#		# Download checkpoints/vae/LoRA to include in image based on model type
+#		# SDXL
+#		RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
+#			wget --progress=dot:giga -O models/checkpoints/sd_xl_base_1.0.safetensors https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors && \
+#			wget --progress=dot:giga -O models/vae/sdxl_vae.safetensors https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors && \
+#			wget --progress=dot:giga -O models/vae/sdxl-vae-fp16-fix.safetensors https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors; \
+#		fi
+#
+#		# Wan 2.1
+#		RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+#			wget --progress=dot:giga -O models/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors; \
+#		fi
+#		# Wan 2.1
+#		RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+#			wget --progress=dot:giga -O models/diffusion_models/wan2.1_t2v_14B_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_t2v_14B_fp16.safetensors; \
+#		fi
+#		# Wan 2.1
+#		RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+#			wget --progress=dot:giga -O models/vae/wan_2.1_vae.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors; \
+#		fi
+#		# Wan 2.1
+#		RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+#			wget --progress=dot:giga -O models/clip_vision/clip_vision_h.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors; \
+#		fi
+#		# Wan 2.1
+#		RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+#			wget --progress=dot:giga -O models/text_encoders/umt5_xxl_fp16.safetensors https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors; \
+#		fi
+#
+#		# SD3.5
+#		RUN if [ "$MODEL_TYPE" = "sd35" ]; then \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/checkpoints/sd3.5_large.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/sd3.5_large.safetensors && \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/t5xxl_fp16.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/t5xxl_fp16.safetensors && \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/clip_g.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_g.safetensors && \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/clip/clip_l.safetensors https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_l.safetensors; \
+#		fi
+#
+#		# FLUX 1 - Schnell
+#		RUN if [ "$MODEL_TYPE" = "flux1-schnell" ]; then \
+#			wget --progress=dot:giga -O models/unet/flux1-schnell.safetensors https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors && \
+#			wget --progress=dot:giga -O models/clip/clip_l.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors && \
+#			wget --progress=dot:giga -O models/clip/t5xxl_fp8_e4m3fn.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors && \
+#			wget --progress=dot:giga -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors; \
+#		fi
+#
+#		# FLUX 1 - Dev
+#		RUN if [ "$MODEL_TYPE" = "flux1" ]; then \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/unet/flux1-dev.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors && \
+#			wget --progress=dot:giga -O models/clip/clip_l.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors && \
+#			wget --progress=dot:giga -O models/clip/t5xxl_fp8_e4m3fn.safetensors https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors && \
+#			wget --progress=dot:giga --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors; \
+#		fi
+#
 # Stage 3: Final image
 FROM base as final
 
