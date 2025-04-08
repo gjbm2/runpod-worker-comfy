@@ -1,6 +1,9 @@
 # Stage 1: Base image with common dependencies
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 as base
 
+ARG HUGGINGFACE_ACCESS_TOKEN
+ARG MODEL_TYPE
+
 # Prevents prompts from packages asking for user input during installation
 ENV DEBIAN_FRONTEND=noninteractive
 # Prefer binary wheels over source distributions for faster pip installations
@@ -9,6 +12,7 @@ ENV PIP_PREFER_BINARY=1
 ENV PYTHONUNBUFFERED=1 
 # Speed up some cmake builds
 ENV CMAKE_BUILD_PARALLEL_LEVEL=8
+
 
 # Add fetch_model helper
 ADD fetch_model.sh /usr/local/bin/fetch_model
@@ -73,9 +77,6 @@ FROM base as downloader
 ADD fetch_model_2.sh /usr/local/bin/fetch_model_2
 RUN chmod +x /usr/local/bin/fetch_model_2
 
-ARG HUGGINGFACE_ACCESS_TOKEN
-ARG MODEL_TYPE
-
 # Change working directory to ComfyUI
 WORKDIR /comfyui
 
@@ -93,24 +94,32 @@ fi
 
 # Wan 2.1
 RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" "clip_vision/clip_vision_h.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    ls -lh models/clip_vision/* && \
+    sync; \
+fi
+
+RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" "vae/wan_2.1_vae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    ls -lh models/vae/* && \
+    sync; \
+fi
+
+RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors" "text_encoders/umt5_xxl_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    ls -lh models/text_encoders/* && \
+    sync; \
+fi
+
+RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    ls -lh models/diffusion_models/* && \
+    sync; \
 fi
 
 #RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
 #    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_t2v_14B_fp16.safetensors" "diffusion_models/wan2.1_t2v_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
 #fi
-
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" "vae/wan_2.1_vae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
-fi
-
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" "clip_vision/clip_vision_h.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
-fi
-
-RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors" "text_encoders/umt5_xxl_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
-fi
 
 # SD3.5
 RUN if [ "$MODEL_TYPE" = "sd35" ]; then \
