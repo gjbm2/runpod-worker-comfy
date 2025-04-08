@@ -9,6 +9,7 @@ import glob
 import requests
 import base64
 from io import BytesIO
+import uuid
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
@@ -276,18 +277,22 @@ def process_output_images(outputs, job_id):
                     # ✅ Pick the most recently modified file
                     latest_video = max(matching_files, key=os.path.getmtime)
                     try:
+                        random_name = str(uuid.uuid4())[:8]
+                        filename = f"{random_name}.{ext}"
                         video_url = rp_upload.upload_file_to_bucket(
-                            file_name=video_filename,
-                            file_location=video_path,
+                            file_name=filename,
+                            file_location=latest_video,
+                            prefix=job_id,
                             extra_args={"ContentType": mime}
                         )
-                        print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_filename})")
+                        
+                        print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_url})")
                         return {
                             "status": "success",
                             "message": video_url
                         }
                     except Exception as e:
-                        print(f"runpod-worker-comfy - failed to upload fallback video {video_filename}: {e}")
+                        print(f"runpod-worker-comfy - failed to upload fallback video {latest_video}: {e}")
         else:
             print("runpod-worker-comfy - S3 not configured, skipping video upload fallback.")
 
@@ -362,6 +367,30 @@ def handler(job):
             return {"error": "Max retries reached while waiting for image generation"}
     except Exception as e:
         return {"error": f"Error waiting for image generation: {str(e)}"}
+        
+    # logging output
+    print(f"🧪 Summary of outputs and timings for prompt ID {prompt_id}:")
+
+    prompt_history = history[prompt_id]
+    outputs = prompt_history.get("outputs", {})
+    timings = prompt_history.get("timings", {})
+
+    for node_id in outputs:
+        output_summary = []
+        node_outputs = outputs[node_id]
+        
+        for key, value in node_outputs.items():
+            if isinstance(value, list):
+                output_summary.append(f"{key}: {len(value)} item(s)")
+            else:
+                output_summary.append(f"{key}: {type(value).__name__}")
+        
+        timing = timings.get(node_id)
+        if timing:
+            duration = timing.get("execution_time", 0)
+            output_summary.append(f"⏱ {duration:.2f}s")
+        
+        print(f"  • Node {node_id}: {', '.join(output_summary)}")
 
     # Get the generated image and return it as URL in an AWS bucket or as base64
     images_result = process_output_images(history[prompt_id].get("outputs"), job["id"])
