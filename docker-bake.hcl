@@ -40,6 +40,18 @@ target "sdxl" {
   inherits = ["base"]
 }
 
+target "wan2" {
+  context = "."
+  dockerfile = "Dockerfile"
+  target = "final"
+  args = {
+    MODEL_TYPE = "wan2"
+	HUGGINGFACE_ACCESS_TOKEN = "${HUGGINGFACE_ACCESS_TOKEN}"
+  }
+  tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}-wan2"]
+  inherits = ["base"]
+}
+
 target "sd35" {
   context = "."
   dockerfile = "Dockerfile"
