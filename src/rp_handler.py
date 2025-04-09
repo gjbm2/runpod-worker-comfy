@@ -305,6 +305,11 @@ def process_output_images(outputs, job_id):
 
 
 def handler(job):
+    print("*****")
+    print("*****")
+    print("*****")
+    print("*****")
+    print("*****")
     """
     The main function that handles a job of generating an image.
 
