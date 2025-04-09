@@ -407,8 +407,8 @@ async def handler(job):
                         break
             except Exception as e:
                 print(f"runpod-worker-comfy - ⚠️ History fetch error: {e}")
-        await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-        retries += 1
+            await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+            retries += 1
         else:
             print("❌ Max retries reached while waiting for image generation.")
             return {"error": "Max retries reached while waiting for image generation"}
