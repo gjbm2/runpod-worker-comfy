@@ -4,7 +4,12 @@
 wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/pftq/Wan2.1-Fixes/refs/heads/main/wan/image2video.py 
 
 # Get laetest rp_handler script
-wget -O /rp_handler.py https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py 
+wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
+
+if [ "$DETAILED_COMFY_LOGGING" = "true" ]; then
+    head -n 10 /rp_handler.py
+fi
+
 
 echo 
 echo "======================================== AWS SYNC ===="
