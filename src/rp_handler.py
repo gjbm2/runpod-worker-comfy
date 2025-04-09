@@ -311,7 +311,7 @@ def handler(job):
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
     DETAILED_LOGGING = True
     if DETAILED_LOGGING:
-        print("Detailed logging enabled.")
+        print("runpod-worker-comfy - Detailed logging enabled.")
     """
     The main function that handles a job of generating an image.
 
@@ -384,7 +384,7 @@ def handler(job):
         
     # logging output
     if DETAILED_LOGGING:
-        print(f"\n📊 DETAILED_COMFY_LOGGING enabled\n")
+        print(f"\nrunpod-worker-comfy - 📊 DETAILED_COMFY_LOGGING enabled\n")
     
         prompt_history = history[prompt_id]
         outputs = prompt_history.get("outputs", {})
