@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Patch image2video
+wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/Wan-Video/Wan2.1/236dd43eddd7632566d837c6ac14f0b4337303de/wan/image2video.py 
+
+# Get laetest rp_handler script
+wget -O /rp_handler.py https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py && 
+
 echo 
 echo "======================================== AWS SYNC ===="
 echo 
