@@ -1,4 +1,4 @@
-# Running rp_handler.py v 17.35 9-Apr-25
+# Running rp_handler.py v 18.45 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
