@@ -380,10 +380,11 @@ async def handler(job):
                 history = get_history(prompt_id)
                 if prompt_id in history:
                     prompt_data = history[prompt_id]
-                    timings = prompt_data.get("timings", {})
-                    if len(timings) >= len(workflow):
-                        print("runpod-worker-comfy - ✅ All workflow nodes have completed.")
+                    if "outputs" in prompt_data and prompt_data["outputs"]:
+                        print("runpod-worker-comfy - ✅ Prompt has output data, assuming complete.")
                         break
+                    else:
+                        print("runpod-worker-comfy - ⏳ Prompt still running, no outputs yet.")
             except Exception as e:
                 print(f"runpod-worker-comfy - ⚠️ Error fetching history: {e}")
             await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
