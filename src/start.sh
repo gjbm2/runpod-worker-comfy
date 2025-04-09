@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo 
+echo "== CONTAINER INIT =="
+echo 
+
 # Patch image2video
 wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/pftq/Wan2.1-Fixes/refs/heads/main/wan/image2video.py 
 
@@ -11,10 +15,6 @@ if [ "$DETAILED_COMFY_LOGGING" = "true" ]; then
     head -n 1 /rp_handler.py
 fi
 
-
-echo 
-echo "======================================== AWS SYNC ===="
-echo 
 export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
 export AWS_DEFAULT_REGION="$BUCKET_AWS_REGION"
@@ -33,6 +33,10 @@ ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
+
+echo 
+echo "== INIT COMPLETE =="
+echo 
 
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
