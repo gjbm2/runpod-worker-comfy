@@ -1,4 +1,4 @@
-# Running rp_handler.py v 11.07am 9-Apr-25
+# Running rp_handler.py v 11.25am 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
@@ -425,27 +425,22 @@ def handler(job):
                 continue
     
             print("   Outputs:")
-            for key, val in node_outputs.items():
-                if isinstance(val, list):
-                    if key.lower() in ("images", "image", "latents", "tensor"):
-                        print(f"     • {key}: {len(val)} item(s)")
+                for key, val in node_outputs.items():
+                    if isinstance(val, list):
+                        if all(hasattr(v, "shape") for v in val):
+                            shapes = [tuple(v.shape) for v in val]
+                            print(f"     • {key}: {len(val)} tensors → shapes: {shapes}")
+                        elif all(isinstance(v, dict) and "samples" in v and hasattr(v["samples"], "shape") for v in val):
+                            shapes = [tuple(v["samples"].shape) for v in val]
+                            print(f"     • {key}: {len(val)} latents → sample shapes: {shapes}")
+                        else:
+                            types = {type(v).__name__ for v in val}
+                            print(f"     • {key}: {len(val)} item(s) ({', '.join(types)})")
+                    elif isinstance(val, dict) and "samples" in val and hasattr(val["samples"], "shape"):
+                        print(f"     • {key}: latent → sample shape: {tuple(val['samples'].shape)}")
                     else:
-                        types = {type(v).__name__ for v in val}
-                        print(f"     • {key}: {len(val)} item(s) ({', '.join(types)})")
-                else:
-                    print(f"     • {key}: {type(val).__name__}")
-    
-            if "images" in node_outputs:
-                print(f"   🖼 Total decoded frames: {len(node_outputs['images'])}")
-    
-            if node_id in reverse_links:
-                downstream = ", ".join(sorted(reverse_links[node_id]))
-                print(f"   ↪ Feeds into: Node(s) {downstream}")
-    
-            if node_id in timings:
-                duration = timings[node_id].get("execution_time", 0)
-                print(f"   ⏱ Duration: {duration:.2f}s")
-
+                        print(f"     • {key}: {type(val).__name__}")
+                        
     # Get the generated image and return it as URL in an AWS bucket or as base64
     try:
         outputs = history[prompt_id].get("outputs", {})
