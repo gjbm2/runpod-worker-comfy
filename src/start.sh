@@ -7,7 +7,7 @@ wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/p
 wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
 
 if [ "$DETAILED_COMFY_LOGGING" = "true" ]; then
-    head -n 10 /rp_handler.py
+    head -n 30 /rp_handler.py
 fi
 
 
