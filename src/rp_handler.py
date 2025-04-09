@@ -13,12 +13,6 @@ import base64
 from io import BytesIO
 import uuid
 
-print("*****")
-print("*****")
-print("*****")
-print("*****")
-print("*****")
-
 DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
 
 # Time to wait between API check attempts in milliseconds
@@ -316,11 +310,6 @@ def process_output_images(outputs, job_id):
 
 
 def handler(job):
-    print("*****")
-    print("*****")
-    print("*****")
-    print("*****")
-    print("*****")
     """
     The main function that handles a job of generating an image.
 
