@@ -30,20 +30,42 @@ COMFY_HOST = "127.0.0.1:8188"
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 
 # --- WebSocket listener for ComfyUI progress (DEBUGGING only) ---
-async def listen_to_ws(stop_event, detailed_logging=True):
-    uri = f"ws://{COMFY_HOST}/ws"
+async def listen_to_ws(stop_event, job_id, detailed_logging=True):
+    comfy_uri = f"ws://{COMFY_HOST}/ws"
+    relay_uri = os.environ.get("BACKEND_WS_URL", "ws://185.254.136.253:8765/")
+
     try:
-        async with websockets.connect(uri) as websocket:
-            print("📡 Connected to ComfyUI WebSocket for debug logs.")
+        async with websockets.connect(comfy_uri) as comfy_ws, \
+                   websockets.connect(relay_uri) as relay_ws:
+
+            print("📡 Connected to ComfyUI WS and relay WS.")
+
             while not stop_event.is_set():
                 try:
-                    msg = await asyncio.wait_for(websocket.recv(), timeout=1)
+                    msg = await asyncio.wait_for(comfy_ws.recv(), timeout=1)
+                    parsed_msg = json.loads(msg)
+
                     if detailed_logging:
-                        print("🧠 WS:", json.dumps(json.loads(msg), indent=2))
+                        print("🧠 WS:", json.dumps(parsed_msg, indent=2))
+
+                    # Wrap with job_id before relaying
+                    wrapped = json.dumps({
+                        "job_id": job_id,
+                        "comfy": parsed_msg
+                    })
+
+                    await relay_ws.send(wrapped)
+                    if detailed_logging:
+                        print(f"📤 Relayed to backend WS with job_id: {job_id}")
+
                 except asyncio.TimeoutError:
                     continue
+                except Exception as e:
+                    print(f"⚠️ Error in WS relay loop: {e}")
+                    break
+
     except Exception as e:
-        print(f"⚠️ WebSocket listener error: {e}")
+        print(f"❌ WebSocket connection error: {e}")
 
 
 def validate_input(job_input):
@@ -361,34 +383,32 @@ async def handler(job):
     # ✅ Start WebSocket listener if logging enabled and loop available
     ws_task = None
     ws_stop_event = None
-    if DETAILED_LOGGING:
-        try:
-            loop = asyncio.get_running_loop()
-            ws_stop_event = asyncio.Event()
-            ws_task = loop.create_task(listen_to_ws(ws_stop_event, detailed_logging=True))
-            print("🚀 WebSocket listener task started.")
-        except RuntimeError:
-            print("❌ No running event loop. Skipping WebSocket listener.")
+    try:
+        loop = asyncio.get_running_loop()
+        ws_stop_event = asyncio.Event()
+        ws_task = loop.create_task(
+            listen_to_ws(ws_stop_event, job_id=job["id"], detailed_logging=True)
+        )
+        print("🚀 WebSocket listener task started.")
+    except RuntimeError:
+        print("❌ No running event loop. Skipping WebSocket listener.")
 
     print(f"runpod-worker-comfy - wait until image generation is complete")
     retries = 0
     history = {}
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
-            print(f"runpod-worker-comfy - ⏳ Polling cycle {retries + 1}")
             try:
                 history = get_history(prompt_id)
                 if prompt_id in history:
                     prompt_data = history[prompt_id]
                     if "outputs" in prompt_data and prompt_data["outputs"]:
-                        print("runpod-worker-comfy - ✅ Prompt has output data, assuming complete.")
+                        print("runpod-worker-comfy - ✅ Outputs detected, generation complete.")
                         break
-                    else:
-                        print("runpod-worker-comfy - ⏳ Prompt still running, no outputs yet.")
             except Exception as e:
-                print(f"runpod-worker-comfy - ⚠️ Error fetching history: {e}")
-            await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-            retries += 1
+                print(f"runpod-worker-comfy - ⚠️ History fetch error: {e}")
+        await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+        retries += 1
         else:
             print("❌ Max retries reached while waiting for image generation.")
             return {"error": "Max retries reached while waiting for image generation"}
