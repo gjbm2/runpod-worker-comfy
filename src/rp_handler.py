@@ -376,17 +376,21 @@ def handler(job):
         
     # logging output
     if DETAILED_LOGGING:
+        if os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true":
+        print(f"\n📊 DETAILED_COMFY_LOGGING enabled\n")
+    
         prompt_history = history[prompt_id]
         outputs = prompt_history.get("outputs", {})
         timings = prompt_history.get("timings", {})
-        workflow = prompt_history.get("workflow", {})
+    
+        # ✅ Use the original workflow from the input — not from history
+        workflow = validated_data["workflow"]
     
         print(f"Found:")
         print(f"  → {len(workflow)} nodes in workflow")
         print(f"  → {len(outputs)} nodes with outputs")
         print(f"  → {len(timings)} nodes with timing\n")
     
-        # Build reverse mapping: what depends on what
         reverse_links = {}
         for nid, node in workflow.items():
             for input_key, input_value in node.get("inputs", {}).items():
@@ -417,7 +421,6 @@ def handler(job):
             print("   Outputs:")
             for key, val in node_outputs.items():
                 if isinstance(val, list):
-                    # If it's images or tensors, just show count
                     if key.lower() in ("images", "image", "latents", "tensor"):
                         print(f"     • {key}: {len(val)} item(s)")
                     else:
@@ -431,7 +434,7 @@ def handler(job):
     
             if node_id in reverse_links:
                 downstream = ", ".join(sorted(reverse_links[node_id]))
-                print(f"   ↪ Feeds into: {downstream}")
+                print(f"   ↪ Feeds into: Node(s) {downstream}")
     
             if node_id in timings:
                 duration = timings[node_id].get("execution_time", 0)
