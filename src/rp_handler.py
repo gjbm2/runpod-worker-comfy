@@ -13,8 +13,6 @@ import base64
 from io import BytesIO
 import uuid
 
-DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
-
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
 # Maximum number of API check attempts
@@ -310,6 +308,7 @@ def process_output_images(outputs, job_id):
 
 
 def handler(job):
+    DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
     """
     The main function that handles a job of generating an image.
 
@@ -435,6 +434,7 @@ def handler(job):
 
     result = {**images_result, "refresh_worker": REFRESH_WORKER}
 
+    print("runpod-worker-comfy - handler completed.")
     return result
 
 
