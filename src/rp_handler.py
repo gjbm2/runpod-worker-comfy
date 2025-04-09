@@ -18,7 +18,7 @@ COMFY_API_AVAILABLE_INTERVAL_MS = 100
 # Maximum number of API check attempts
 COMFY_API_AVAILABLE_MAX_RETRIES = 100000
 # Time to wait between poll attempts in milliseconds
-COMFY_POLLING_INTERVAL_MS = int(os.environ.get("COMFY_POLLING_INTERVAL_MS", 250))
+COMFY_POLLING_INTERVAL_MS = int(os.environ.get("COMFY_POLLING_INTERVAL_MS", 1000))
 # Maximum number of poll attempts
 COMFY_POLLING_MAX_RETRIES = int(os.environ.get("COMFY_POLLING_MAX_RETRIES", 100000))
 # Host where ComfyUI is running
@@ -103,6 +103,31 @@ def check_server(url, retries=5000, delay=50):
     )
     return False
 
+def log_comfy_progress(prompt_id):
+    try:
+        while True:
+            response = requests.get(f"http://{COMFY_HOST}/queue")
+            if response.status_code == 200:
+                queue_status = response.json()
+
+                if not queue_status.get("queue_running"):
+                    print("runpod-worker-comfy - Queue is no longer running.")
+                    break
+
+                current = queue_status.get("current", {})
+                if current.get("prompt_id") == prompt_id:
+                    node = current.get("node", "<unknown>")
+                    progress = current.get("progress", None)
+                    if progress is not None:
+                        print(f"runpod-worker-comfy - ⏳ Node: {node} — {round(progress * 100)}%")
+                    else:
+                        print(f"runpod-worker-comfy - ▶️ Node: {node} running...")
+            else:
+                print(f"runpod-worker-comfy - Failed to get queue status: {response.status_code}")
+
+            time.sleep(1)  # poll every second
+    except Exception as e:
+        print(f"runpod-worker-comfy - Error in progress logger: {e}")
 
 def upload_images(images):
     """
@@ -370,6 +395,8 @@ def handler(job):
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
             history = get_history(prompt_id)
+
+            log_comfy_progress(prompt_id)
 
             # Exit the loop if we have found the history
             if prompt_id in history and history[prompt_id].get("outputs"):
