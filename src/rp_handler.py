@@ -376,7 +376,6 @@ def handler(job):
         
     # logging output
     if DETAILED_LOGGING:
-        if os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true":
         print(f"\n📊 DETAILED_COMFY_LOGGING enabled\n")
     
         prompt_history = history[prompt_id]
