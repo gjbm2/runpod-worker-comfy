@@ -331,10 +331,13 @@ def handler(job):
     if error_message:
         print(f"❌ Validation error: {error_message}")
         return {"error": error_message}
-
+    
     # Extract validated data
     workflow = validated_data["workflow"]
     images = validated_data.get("images")
+
+    if DETAILED_LOGGING:
+        print workflow
 
     # Make sure that the ComfyUI API is available
     if not check_server(
