@@ -1,4 +1,4 @@
-# Running rp_handler.py v 14.03am 9-Apr-25
+# Running rp_handler.py v 17.19 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
@@ -102,32 +102,6 @@ def check_server(url, retries=5000, delay=50):
         f"runpod-worker-comfy - Failed to connect to server at {url} after {retries} attempts."
     )
     return False
-
-def log_comfy_progress(prompt_id):
-    try:
-        while True:
-            response = requests.get(f"http://{COMFY_HOST}/queue")
-            if response.status_code == 200:
-                queue_status = response.json()
-
-                if not queue_status.get("queue_running"):
-                    print("runpod-worker-comfy - Queue is no longer running.")
-                    break
-
-                current = queue_status.get("current", {})
-                if current.get("prompt_id") == prompt_id:
-                    node = current.get("node", "<unknown>")
-                    progress = current.get("progress", None)
-                    if progress is not None:
-                        print(f"runpod-worker-comfy - ⏳ Node: {node} — {round(progress * 100)}%")
-                    else:
-                        print(f"runpod-worker-comfy - ▶️ Node: {node} running...")
-            else:
-                print(f"runpod-worker-comfy - Failed to get queue status: {response.status_code}")
-
-            time.sleep(1)  # poll every second
-    except Exception as e:
-        print(f"runpod-worker-comfy - Error in progress logger: {e}")
 
 def upload_images(images):
     """
@@ -396,7 +370,22 @@ def handler(job):
         while retries < COMFY_POLLING_MAX_RETRIES:
             history = get_history(prompt_id)
 
-            log_comfy_progress(prompt_id)
+            if DETAILED_LOGGING:
+                try:
+                    response = requests.get(f"http://{COMFY_HOST}/queue")
+                    if response.status_code == 200:
+                        queue_status = response.json()
+            
+                        current = queue_status.get("current", {})
+                        if current.get("prompt_id") == prompt_id:
+                            node = current.get("node", "<unknown>")
+                            progress = current.get("progress", None)
+                            if progress is not None:
+                                print(f"runpod-worker-comfy - ⏳ Node: {node} — {round(progress * 100)}%")
+                            else:
+                                print(f"runpod-worker-comfy - ▶️ Node: {node} running...")
+                except Exception as e:
+                    print(f"runpod-worker-comfy - ⚠️ Error checking progress: {e}")
 
             # Exit the loop if we have found the history
             if prompt_id in history and history[prompt_id].get("outputs"):
