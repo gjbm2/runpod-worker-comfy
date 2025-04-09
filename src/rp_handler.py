@@ -425,21 +425,21 @@ def handler(job):
                 continue
     
             print("   Outputs:")
-                for key, val in node_outputs.items():
-                    if isinstance(val, list):
-                        if all(hasattr(v, "shape") for v in val):
-                            shapes = [tuple(v.shape) for v in val]
-                            print(f"     • {key}: {len(val)} tensors → shapes: {shapes}")
-                        elif all(isinstance(v, dict) and "samples" in v and hasattr(v["samples"], "shape") for v in val):
-                            shapes = [tuple(v["samples"].shape) for v in val]
-                            print(f"     • {key}: {len(val)} latents → sample shapes: {shapes}")
-                        else:
-                            types = {type(v).__name__ for v in val}
-                            print(f"     • {key}: {len(val)} item(s) ({', '.join(types)})")
-                    elif isinstance(val, dict) and "samples" in val and hasattr(val["samples"], "shape"):
-                        print(f"     • {key}: latent → sample shape: {tuple(val['samples'].shape)}")
+            for key, val in node_outputs.items():
+                if isinstance(val, list):
+                    if all(hasattr(v, "shape") for v in val):
+                        shapes = [tuple(v.shape) for v in val]
+                        print(f"     • {key}: {len(val)} tensors → shapes: {shapes}")
+                    elif all(isinstance(v, dict) and "samples" in v and hasattr(v["samples"], "shape") for v in val):
+                        shapes = [tuple(v["samples"].shape) for v in val]
+                        print(f"     • {key}: {len(val)} latents → sample shapes: {shapes}")
                     else:
-                        print(f"     • {key}: {type(val).__name__}")
+                        types = {type(v).__name__ for v in val}
+                        print(f"     • {key}: {len(val)} item(s) ({', '.join(types)})")
+                elif isinstance(val, dict) and "samples" in val and hasattr(val["samples"], "shape"):
+                    print(f"     • {key}: latent → sample shape: {tuple(val['samples'].shape)}")
+                else:
+                    print(f"     • {key}: {type(val).__name__}")
                         
     # Get the generated image and return it as URL in an AWS bucket or as base64
     try:
