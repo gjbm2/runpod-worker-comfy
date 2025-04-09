@@ -323,7 +323,7 @@ def process_output_images(outputs, job_id):
             "message": f"the image does not exist in the specified output folder: {local_image_path}",
         }
 
-
+def handler(job):
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
     DETAILED_LOGGING = True
     if DETAILED_LOGGING:
