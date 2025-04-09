@@ -309,6 +309,8 @@ def process_output_images(outputs, job_id):
 
 def handler(job):
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
+    if DETAILED_LOGGING:
+        print("Detailed logging enabled.")
     """
     The main function that handles a job of generating an image.
 
