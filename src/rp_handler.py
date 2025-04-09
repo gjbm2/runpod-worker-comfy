@@ -1,4 +1,4 @@
-# GJBM was here @ 10.31am 9-Apr-25
+# Running rp_handler.py v 10.31am 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
