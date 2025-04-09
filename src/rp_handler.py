@@ -337,7 +337,7 @@ def handler(job):
     images = validated_data.get("images")
 
     if DETAILED_LOGGING:
-        print workflow
+        print("runpod-worker-comfy - Workflow input: {workflow}")
 
     # Make sure that the ComfyUI API is available
     if not check_server(
