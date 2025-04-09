@@ -8,7 +8,7 @@ wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-co
 
 # Check we defintitely have the right version of rp_handler.py
 if [ "$DETAILED_COMFY_LOGGING" = "true" ]; then
-    head -n 30 /rp_handler.py
+    head -n 1 /rp_handler.py
 fi
 
 
