@@ -11,7 +11,13 @@ import base64
 from io import BytesIO
 import uuid
 
-DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "false").lower() == "true"
+print("*****")
+print("*****")
+print("*****")
+print("*****")
+print("*****")
+
+DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
@@ -264,7 +270,9 @@ def process_output_images(outputs, job_id):
             print(
                 "runpod-worker-comfy - the image was generated and converted to base64"
             )
-
+            
+        if os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true":
+            print(f"Published image/video URL: {image}")
         return {
             "status": "success",
             "message": image,
@@ -287,7 +295,6 @@ def process_output_images(outputs, job_id):
                             prefix=job_id,
                             extra_args={"ContentType": mime}
                         )
-                        
                         print(f"runpod-worker-comfy - video was generated and uploaded to AWS S3 ({video_url})")
                         return {
                             "status": "success",
