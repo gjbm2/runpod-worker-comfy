@@ -11,6 +11,8 @@ import base64
 from io import BytesIO
 import uuid
 
+DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "false").lower() == "true"
+
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
 # Maximum number of API check attempts
@@ -374,28 +376,61 @@ def handler(job):
         return {"error": f"Error waiting for image generation: {str(e)}"}
         
     # logging output
-    print(f"🧪 Summary of outputs and timings for prompt ID {prompt_id}:")
+    if DETAILED_LOGGING:
+        prompt_history = history[prompt_id]
+        outputs = prompt_history.get("outputs", {})
+        timings = prompt_history.get("timings", {})
+        workflow = prompt_history.get("workflow", {})
+    
+        reverse_links = {}
+        for nid, node in workflow.items():
+            for input_key, input_value in node.get("inputs", {}).items():
+                if isinstance(input_value, list) and len(input_value) == 2:
+                    from_node = str(input_value[0])
+                    reverse_links.setdefault(from_node, set()).add(nid)
+    
+        for node_id in outputs:
+            node = workflow.get(node_id, {})
+            inputs = node.get("inputs", {})
+            if not outputs[node_id]:
+                print(f"  • Node {node_id}: ❌ No outputs returned")
+                continue
+    
+            output_summary = []
+            node_outputs = outputs[node_id]
+    
+            for key, value in node_outputs.items():
+                if isinstance(value, list):
+                    if key.lower() in ("images", "image", "latents", "tensor"):
+                        output_summary.append(f"{key}: {len(value)} item(s)")
+                    else:
+                        sample_types = {type(v).__name__ for v in value}
+                        output_summary.append(f"{key}: {len(value)} item(s) ({', '.join(sample_types)})")
+                else:
+                    output_summary.append(f"{key}: {type(value).__name__}")
+    
+            timing = timings.get(node_id)
+            if timing:
+                duration = timing.get("execution_time", 0)
+                output_summary.append(f"⏱ {duration:.2f}s")
+    
+            print(f"  • Node {node_id}: {', '.join(output_summary)}")
+    
+            if "images" in node_outputs:
+                print(f"     → Total decoded frames: {len(node_outputs['images'])}")
+    
+            if inputs:
+                print(f"     Inputs:")
+                for input_key, input_value in inputs.items():
+                    if isinstance(input_value, list) and len(input_value) == 2:
+                        print(f"       • {input_key} ← Node {input_value[0]} (output {input_value[1]})")
+                    else:
+                        print(f"       • {input_key} = {input_value}")
+    
+            if node_id in reverse_links:
+                downstream = ", ".join(sorted(reverse_links[node_id]))
+                print(f"     ↳ Feeds into: Node(s) {downstream}")
 
-    prompt_history = history[prompt_id]
-    outputs = prompt_history.get("outputs", {})
-    timings = prompt_history.get("timings", {})
-
-    for node_id in outputs:
-        output_summary = []
-        node_outputs = outputs[node_id]
-        
-        for key, value in node_outputs.items():
-            if isinstance(value, list):
-                output_summary.append(f"{key}: {len(value)} item(s)")
-            else:
-                output_summary.append(f"{key}: {type(value).__name__}")
-        
-        timing = timings.get(node_id)
-        if timing:
-            duration = timing.get("execution_time", 0)
-            output_summary.append(f"⏱ {duration:.2f}s")
-        
-        print(f"  • Node {node_id}: {', '.join(output_summary)}")
 
     # Get the generated image and return it as URL in an AWS bucket or as base64
     images_result = process_output_images(history[prompt_id].get("outputs"), job["id"])
