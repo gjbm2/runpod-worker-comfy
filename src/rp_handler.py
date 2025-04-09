@@ -376,14 +376,20 @@ def handler(job):
                     response = requests.get(f"http://{COMFY_HOST}/queue")
                     if response.status_code == 200:
                         queue_status = response.json()
+            
                         current = queue_status.get("current", {})
-                        if current.get("prompt_id") == prompt_id:
+                        current_id = current.get("prompt_id")
+                        if not current:
+                            print("runpod-worker-comfy - ⚠️ /queue has no active job.")
+                        elif current_id != prompt_id:
+                            print(f"runpod-worker-comfy - ⚠️ /queue running different prompt: {current_id}")
+                        else:
                             node = current.get("node", "<unknown>")
-                            progress = current.get("progress", None)
+                            progress = current.get("progress")
                             if progress is not None:
                                 print(f"runpod-worker-comfy - ⏳ Node: {node} — {round(progress * 100)}%")
                             else:
-                                print(f"runpod-worker-comfy - ▶️ Node: {node} running...")
+                                print(f"runpod-worker-comfy - ▶️ Node: {node} running (no % reported)")
                 except Exception as e:
                     print(f"runpod-worker-comfy - ⚠️ Error checking progress: {e}")
     
