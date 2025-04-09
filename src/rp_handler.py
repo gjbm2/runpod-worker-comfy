@@ -339,7 +339,7 @@ async def handler(job):
     images = validated_data.get("images")
 
     if DETAILED_LOGGING:
-        print("runpod-worker-comfy - Workflow input: {workflow}")
+        print(f"runpod-worker-comfy - Workflow input: {json.dumps(workflow)[:500]}...")
 
     if not check_server(f"http://{COMFY_HOST}", COMFY_API_AVAILABLE_MAX_RETRIES, COMFY_API_AVAILABLE_INTERVAL_MS):
         print("❌ ComfyUI API is not reachable.")
@@ -358,15 +358,21 @@ async def handler(job):
         print(f"❌ Exception while queuing workflow: {e}")
         return {"error": f"Error queuing workflow: {str(e)}"}
 
-    # ✅ Start WebSocket listener after queuing the workflow
-    ws_stop_event = asyncio.Event() if DETAILED_LOGGING else None
+    # ✅ Start WebSocket listener if logging enabled and loop available
+    ws_task = None
+    ws_stop_event = None
     if DETAILED_LOGGING:
-        ws_task = asyncio.create_task(listen_to_ws(ws_stop_event, detailed_logging=True))
-    else:
-        ws_task = None
+        try:
+            loop = asyncio.get_running_loop()
+            ws_stop_event = asyncio.Event()
+            ws_task = loop.create_task(listen_to_ws(ws_stop_event, detailed_logging=True))
+            print("🚀 WebSocket listener task started.")
+        except RuntimeError:
+            print("❌ No running event loop. Skipping WebSocket listener.")
 
     print(f"runpod-worker-comfy - wait until image generation is complete")
     retries = 0
+    history = {}
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
             print(f"runpod-worker-comfy - ⏳ Polling cycle {retries + 1}")
@@ -380,7 +386,7 @@ async def handler(job):
                         break
             except Exception as e:
                 print(f"runpod-worker-comfy - ⚠️ Error fetching history: {e}")
-            time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+            await asyncio.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
             retries += 1
         else:
             print("❌ Max retries reached while waiting for image generation.")
@@ -389,10 +395,6 @@ async def handler(job):
         print(f"❌ Exception while polling for history: {e}")
         return {"error": f"Error waiting for image generation: {str(e)}"}
 
-    if DETAILED_LOGGING:
-        # ... all your existing logging logic ...
-        pass
-
     try:
         outputs = history[prompt_id].get("outputs", {})
         if not outputs:
@@ -400,17 +402,18 @@ async def handler(job):
             return {"error": "No outputs found for prompt"}
 
         images_result = process_output_images(outputs, job["id"])
-
         if images_result.get("status") != "success":
             print(f"❌ process_output_images failed: {images_result}")
             return images_result
 
         result = {**images_result, "refresh_worker": REFRESH_WORKER}
 
-        # ✅ Cleanly stop the WebSocket listener
+        # ✅ Cleanly shut down WebSocket listener
         if ws_task:
+            print("🛑 Stopping WebSocket listener...")
             ws_stop_event.set()
             await ws_task
+            print("✅ WebSocket listener stopped.")
 
         print("runpod-worker-comfy - handler completed.")
         return result
@@ -418,6 +421,7 @@ async def handler(job):
     except Exception as e:
         print(f"❌ Unexpected exception during final processing: {e}")
         return {"error": f"Unhandled error while finalizing result: {str(e)}"}
+
 
 # ✅ Async wrapper for handler
 async def async_handler(job):
