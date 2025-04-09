@@ -1,4 +1,4 @@
-# Running rp_handler.py v 18.45 9-Apr-25
+# Running rp_handler.py v 18.51 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
@@ -323,7 +323,7 @@ def process_output_images(outputs, job_id):
             "message": f"the image does not exist in the specified output folder: {local_image_path}",
         }
 
-def handler(job):
+async def handler(job):
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
     DETAILED_LOGGING = True
     if DETAILED_LOGGING:
