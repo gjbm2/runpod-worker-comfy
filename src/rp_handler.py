@@ -368,14 +368,14 @@ def handler(job):
     retries = 0
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
-            history = get_history(prompt_id)
-
+            print(f"runpod-worker-comfy - ⏳ Polling cycle {retries + 1}")
+    
+            # Step 1: Log /queue progress
             if DETAILED_LOGGING:
                 try:
                     response = requests.get(f"http://{COMFY_HOST}/queue")
                     if response.status_code == 200:
                         queue_status = response.json()
-            
                         current = queue_status.get("current", {})
                         if current.get("prompt_id") == prompt_id:
                             node = current.get("node", "<unknown>")
@@ -386,21 +386,29 @@ def handler(job):
                                 print(f"runpod-worker-comfy - ▶️ Node: {node} running...")
                 except Exception as e:
                     print(f"runpod-worker-comfy - ⚠️ Error checking progress: {e}")
-
-            # Exit the loop if we have found the history
-            if prompt_id in history and history[prompt_id].get("outputs"):
-                break
-            else:
-                # Wait before trying again
-                time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-                retries += 1
+    
+            # Step 2: Check for job completion
+            try:
+                history = get_history(prompt_id)
+    
+                if prompt_id in history:
+                    prompt_data = history[prompt_id]
+                    timings = prompt_data.get("timings", {})
+                    if len(timings) >= len(workflow):  # All nodes have completed
+                        print("runpod-worker-comfy - ✅ All workflow nodes have completed.")
+                        break
+            except Exception as e:
+                print(f"runpod-worker-comfy - ⚠️ Error fetching history: {e}")
+    
+            time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+            retries += 1
         else:
             print("❌ Max retries reached while waiting for image generation.")
             return {"error": "Max retries reached while waiting for image generation"}
     except Exception as e:
         print(f"❌ Exception while polling for history: {e}")
         return {"error": f"Error waiting for image generation: {str(e)}"}
-        
+            
     # logging output
     if DETAILED_LOGGING:
         print(f"\nrunpod-worker-comfy - 📊 DETAILED_COMFY_LOGGING enabled\n")
