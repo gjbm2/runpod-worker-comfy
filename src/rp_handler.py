@@ -1,4 +1,4 @@
-# Running rp_handler.py v 12.44am 9-Apr-25
+# Running rp_handler.py v 13.19am 9-Apr-25
 
 import runpod
 from runpod.serverless.utils import rp_upload
@@ -309,6 +309,7 @@ def process_output_images(outputs, job_id):
 
 def handler(job):
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
+    DETAILED_LOGGING = True
     if DETAILED_LOGGING:
         print("Detailed logging enabled.")
     """
