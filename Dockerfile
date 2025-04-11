@@ -22,6 +22,7 @@ RUN chmod +x /usr/local/bin/fetch_model
 RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip \
+    libglib2.0-0 \
     git \
     wget \
     libgl1 \
