@@ -352,6 +352,11 @@ async def handler(job):
         print("runpod-worker-comfy - Detailed logging enabled.")
 
     job_input = job["input"]
+    # ✅ Handle restart trigger
+    if isinstance(job_input, dict) and job_input.get("type") == "restart":
+        print("🔁 Soft reboot requested via job input. Restarting worker process...")
+        os.execv(sys.executable, ['python'] + sys.argv)  # Replaces current process
+    
     validated_data, error_message = validate_input(job_input)
     if error_message:
         print(f"❌ Validation error: {error_message}")
