@@ -34,6 +34,7 @@ fi
 cp -v -u /runpod-volume/snapshots/* /
 
 # Try to restore nodes
+apt update && apt install -y libglib2.0-0        # TEMP UNTIL WE HAVE RE-ROLLED CONTAINER
 /restore_snapshots.sh
 
 # pull in custom nodes
