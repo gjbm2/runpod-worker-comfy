@@ -13,6 +13,7 @@ import base64
 from io import BytesIO
 import uuid
 import asyncio
+import socket
 import websockets  # ✅ added for WebSocket logging
 
 # Time to wait between API check attempts in milliseconds
@@ -355,11 +356,25 @@ async def handler(job):
     if DETAILED_LOGGING:
         print("runpod-worker-comfy - Detailed logging enabled.")
 
-    job_input = job["input"]
-    # ✅ Handle restart trigger
+    job_input = job["input"]  # ✅ Move this up here
+    # ✅ Handle restart trigger with optional target_worker
     if isinstance(job_input, dict) and job_input.get("type") == "restart":
-        print("🔁 Soft reboot requested via job input. Restarting worker process...")
-        os.execv(sys.executable, ['python'] + sys.argv)  # Replaces current process
+        current_worker = socket.gethostname()
+        target_worker = job_input.get("target_worker")
+    
+        if target_worker:
+            if current_worker != target_worker:
+                print(f"🚫 Restart requested, but this is not the target worker ({current_worker} ≠ {target_worker}). Requeuing...")
+                return {
+                    "retry": True,
+                    "message": f"Not the correct worker ({current_worker})"
+                }
+            else:
+                print(f"🔁 Restart trigger matched for this worker ({current_worker}). Proceeding with restart...")
+        else:
+            print(f"🔁 Restart trigger received without specific target. Restarting current worker ({current_worker})...")
+    
+        os.execv(sys.executable, ['python'] + sys.argv)
     
     validated_data, error_message = validate_input(job_input)
     if error_message:
