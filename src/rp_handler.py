@@ -351,15 +351,17 @@ def process_output_images(outputs, job_id):
         }
 
 async def handler(job):
+    current_worker = socket.gethostname()
+    
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
     DETAILED_LOGGING = True
     if DETAILED_LOGGING:
-        print("runpod-worker-comfy - Detailed logging enabled.")
+        print("runpod-worker-comfy - Detailed logging enabled.")    
+        print(f"This worker is called: {current_worker}.")
 
     job_input = job["input"]  # ✅ Move this up here
     # ✅ Handle restart trigger with optional target_worker
     if isinstance(job_input, dict) and job_input.get("type") == "restart":
-        current_worker = socket.gethostname()
         target_worker = job_input.get("target_worker")
     
         if target_worker:
