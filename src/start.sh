@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo 
-echo "Script version 11-Apr-25, 21.53"
+echo "Script version 11-Apr-25, 22.19"
 echo 
 echo "== CONTAINER INIT =="
 echo 
