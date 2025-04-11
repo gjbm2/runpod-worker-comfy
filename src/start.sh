@@ -31,7 +31,6 @@ if [ "$COPY_SCRIPTS" == "true" ]; then
     cp -v -u -r /runpod-volume/models/* /comfyui/models/
 fi
 
-cp -v -u -r /runpod-volume/models/* /comfyui/models/
 cp -v -u /runpod-volume/snapshots/* /
 
 # Try to restore nodes
