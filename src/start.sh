@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 echo 
+echo "Script version 11-Apr-25, 21.53"
+echo 
 echo "== CONTAINER INIT =="
 echo 
 
@@ -9,6 +11,8 @@ wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/p
 
 # Get laetest rp_handler script
 wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
+wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
+chmod +x /restore_snapshots.sh
 
 # Check we defintitely have the right version of rp_handler.py
 if [ "$DETAILED_COMFY_LOGGING" = "true" ]; then
