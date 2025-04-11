@@ -27,8 +27,14 @@ if [ "$COPY_SCRIPTS" == "true" ]; then
     cp -v -u -r /runpod-volume/models/* /comfyui/models/
 fi
 
+cp -v -u -r /runpod-volume/models/* /comfyui/models/
+cp -v -u /runpod-volume/snapshots/* /
+
+# Try to restore nodes
+/restore_snapshots.sh
+
 # pull in custom nodes
-ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes 
+# ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes 
 
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
