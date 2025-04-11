@@ -22,9 +22,9 @@ fi
 export AWS_ACCESS_KEY_ID="$BUCKET_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$BUCKET_SECRET_ACCESS_KEY"
 export AWS_DEFAULT_REGION="$BUCKET_AWS_REGION"
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models --no-progress
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes --no-progress
-aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots --no-progress
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/models /runpod-volume/models --no-progress --delete
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/custom_nodes /runpod-volume/custom_nodes --no-progress --delete
+aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots --no-progress --delete
 
 if [ "$COPY_SCRIPTS" == "true" ]; then
     # copy them over for performance reasons...
