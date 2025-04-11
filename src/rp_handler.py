@@ -313,7 +313,11 @@ def process_output_images(outputs, job_id):
     else:
         # If no image was found, try looking for a fallback video file
         if os.environ.get("BUCKET_ENDPOINT_URL", False):
-            for ext, mime in [("webm", "video/webm"), ("webp", "image/webp")]:
+            for ext, mime in [
+                ("mp4", "video/mp4"),       # ✅ Add H.264 MP4 support
+                ("webm", "video/webm"),
+                ("webp", "image/webp")
+            ]:
                 pattern = os.path.join(COMFY_OUTPUT_PATH, f"output_video*.{ext}")
                 matching_files = glob.glob(pattern)
                 if matching_files:
