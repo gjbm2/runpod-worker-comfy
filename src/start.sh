@@ -30,7 +30,7 @@ if [ "$AWS_SYNC" == "true" ]; then
     aws s3 sync s3://stable-diffusion-bucket-gjbm2/snapshots /runpod-volume/snapshots --no-progress --delete
 fi
 
-if [ "$COPY_SCRIPTS" == "true" ]; then
+if [ "$COPY_MODELS" == "true" ]; then
     # copy them over for performance reasons...
     cp -v -u -r /runpod-volume/models/* /comfyui/models/
 fi
