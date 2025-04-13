@@ -354,7 +354,7 @@ async def handler(job):
     current_worker = socket.gethostname()
     
     DETAILED_LOGGING = os.environ.get("DETAILED_COMFY_LOGGING", "true").lower() == "true"
-    DETAILED_LOGGING = True
+    # DETAILED_LOGGING = True
     if DETAILED_LOGGING:
         print("runpod-worker-comfy - Detailed logging enabled.")    
         print(f"This worker is called: {current_worker}.")
