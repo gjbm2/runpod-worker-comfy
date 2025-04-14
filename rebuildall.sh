@@ -19,9 +19,6 @@ DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
 
 DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-wan2
 
-bash stop_server.sh
-exit 0
-
 echo "BASE"
 DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
   --build-arg MODEL_TYPE=base \
