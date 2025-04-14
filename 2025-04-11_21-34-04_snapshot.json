@@ -9,6 +9,14 @@
             "hash": "dff0221df4859a6de4a7ef26d5a3900a153818e1",
             "disabled": false
         },
+        "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation": {
+            "hash": "7578205bd810cf96257b2e32d534b4513892af37",
+            "disabled": false
+        },
+        "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite": {
+            "hash": "df55f01d1df2f7bf5cc772294bc2e6d8bab22d66",
+            "disabled": false
+        },
         "https://github.com/cubiq/ComfyUI_IPAdapter_plus": {
             "hash": "9d076a3df0d2763cef5510ec5ab807f6632c39f5",
             "disabled": false
@@ -46,6 +54,7 @@
         "colour-science==0.4.6": "",
         "contourpy==1.3.1": "",
         "cryptography==44.0.0": "",
+        "cupy-cuda12x==13.4.1": "",
         "cycler==0.12.1": "",
         "ddt==1.7.2": "",
         "Deprecated==1.2.18": "",
@@ -53,6 +62,7 @@
         "easydict==1.13": "",
         "einops==0.8.0": "",
         "eval_type_backport==0.2.2": "",
+        "fastrlock==0.8.3": "",
         "filelock==3.17.0": "",
         "flet==0.27.6": "",
         "fonttools==4.56.0": "",
@@ -67,6 +77,7 @@
         "huggingface-hub==0.28.1": "",
         "idna==3.10": "",
         "imageio==2.37.0": "",
+        "imageio-ffmpeg==0.6.0": "",
         "Jinja2==3.1.5": "",
         "jsonschema==4.23.0": "",
         "jsonschema-specifications==2024.10.1": "",
