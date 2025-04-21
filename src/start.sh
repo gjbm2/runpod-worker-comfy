@@ -62,7 +62,7 @@ if [ "$COPY_MODELS" == "true" ]; then
 fi
 
 if [ "$COPY_SNAPSHOTS" == "true" ]; then
-    cp -v -u /runpod-volume/snapshots/* .
+    cp -v -u /runpod-volume/snapshots/* /
     # Try to restore nodes
     # apt update && apt install -y libglib2.0-0        # TEMP UNTIL WE HAVE RE-ROLLED CONTAINER
     /restore_snapshots.sh
