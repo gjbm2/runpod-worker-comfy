@@ -34,8 +34,6 @@ if [ "$LIVE_PATCH" == "true" ]; then
     
     # Reinstall dependencies (if needed)
     pip install -r requirements.txt
-
-    wget 
     
 fi
 
