@@ -16,6 +16,8 @@ if [ "$LIVE_PATCH" == "true" ]; then
     wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
     chmod +x /restore_snapshots.sh
 
+    pushd "$(pwd)" > /dev/null
+    
     # upgrade comfy
     cd /comfyui
     
@@ -34,6 +36,8 @@ if [ "$LIVE_PATCH" == "true" ]; then
     
     # Reinstall dependencies (if needed)
     pip install -r requirements.txt
+    
+    popd > /dev/null
     
 fi
 
