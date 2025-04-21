@@ -12,7 +12,7 @@ if [ "$LIVE_PATCH" == "true" ]; then
 
     # Get laetest rp_handler script
     wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
-    wget -O /extra_model_paths.yaml "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/extra_model_paths.yaml?$(date +%s%N)" 
+    wget -O /comfyui/extra_model_paths.yaml "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/extra_model_paths.yaml?$(date +%s%N)" 
     wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
     chmod +x /restore_snapshots.sh
 
