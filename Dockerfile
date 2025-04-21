@@ -113,7 +113,9 @@ RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
 fi
 
 RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    #fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    
     ls -lh models/diffusion_models/* && \
     sync; \
 fi
