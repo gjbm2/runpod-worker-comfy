@@ -16,11 +16,6 @@ if [ "$LIVE_PATCH" == "true" ]; then
     wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
     chmod +x /restore_snapshots.sh
 
-    mkdir /runpod-volume/models/diffusion_models/
-    cd /runpod-volume/models/diffusion_models/
-    wget -nc --progress=dot:giga https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors
-    cd /
-
     # upgrade comfy
     cd /comfyui
     
