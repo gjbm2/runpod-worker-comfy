@@ -1,5 +1,6 @@
 # Build scripts
 rebuildall.sh
+rebuildall_parallel.sh
 retry-docker-push.sh
 push_race.sh
 
