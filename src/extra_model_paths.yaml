@@ -1,5 +1,6 @@
 runpod_worker_comfy:
   base_path: /runpod-volume
+  diffusion_models: models/diffusion_models/
   checkpoints: models/checkpoints/
   clip: models/clip/
   clip_vision: models/clip_vision/

@@ -7,13 +7,38 @@ echo "== CONTAINER INIT =="
 echo 
 
 if [ "$LIVE_PATCH" == "true" ]; then
-    # Patch image2video
-    wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/pftq/Wan2.1-Fixes/refs/heads/main/wan/image2video.py 
+    ## Patch image2video
+    #wget -O /comfyui/comfy_extras/image2video.py https://raw.githubusercontent.com/pftq/Wan2.1-Fixes/refs/heads/main/wan/image2video.py 
 
     # Get laetest rp_handler script
     wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
+    wget -O /comfyui/extra_model_paths.yaml "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/extra_model_paths.yaml?$(date +%s%N)" 
     wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
     chmod +x /restore_snapshots.sh
+
+    pushd "$(pwd)" > /dev/null
+    
+    # upgrade comfy
+    cd /comfyui
+    
+    # Clean any local changes to avoid conflicts
+    git reset --hard
+    git clean -fd
+    
+    # Fetch all tags
+    git fetch --all --tags
+    
+    # Checkout the specific version
+    git checkout v0.3.29
+    
+    # Pull the latest for that tag (just in case)
+    git pull origin v0.3.29
+    
+    # Reinstall dependencies (if needed)
+    pip install -r requirements.txt
+    
+    popd > /dev/null
+    
 fi
 
 # Check we defintitely have the right version of rp_handler.py
@@ -33,10 +58,11 @@ fi
 if [ "$COPY_MODELS" == "true" ]; then
     # copy them over for performance reasons...
     cp -v -u -r /runpod-volume/models/* /comfyui/models/
+    #cp -v -u  /runpod-volume/models/diffusion_models/[NAME HERE] /comfyui/models/diffusion_models/[NAME HERE]
 fi
 
 if [ "$COPY_SNAPSHOTS" == "true" ]; then
-    cp -v -u /runpod-volume/snapshots/* 
+    cp -v -u /runpod-volume/snapshots/* /
     # Try to restore nodes
     # apt update && apt install -y libglib2.0-0        # TEMP UNTIL WE HAVE RE-ROLLED CONTAINER
     /restore_snapshots.sh

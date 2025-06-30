@@ -43,7 +43,7 @@ RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 RUN pip install comfy-cli
 
 # Install ComfyUI
-RUN /usr/bin/yes | comfy --workspace /comfyui install --cuda-version 11.8 --nvidia --version 0.3.26
+RUN /usr/bin/yes | comfy --workspace /comfyui install --cuda-version 11.8 --nvidia --version 0.3.29
 
 # Change working directory to ComfyUI
 WORKDIR /comfyui
@@ -113,7 +113,9 @@ RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
 fi
 
 RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    #fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    
     ls -lh models/diffusion_models/* && \
     sync; \
 fi
