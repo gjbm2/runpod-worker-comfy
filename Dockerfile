@@ -1,8 +1,8 @@
 # Stage 1: Base image with common dependencies
+# NOTE: ARGs are intentionally NOT defined here to preserve Docker layer caching.
+# The base stage is identical across all MODEL_TYPE builds, allowing massive cache reuse.
+# MODEL_TYPE and HUGGINGFACE_ACCESS_TOKEN are defined in the downloader stage only.
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 as base
-
-ARG HUGGINGFACE_ACCESS_TOKEN
-ARG MODEL_TYPE
 
 # Prevents prompts from packages asking for user input during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,7 +12,6 @@ ENV PIP_PREFER_BINARY=1
 ENV PYTHONUNBUFFERED=1 
 # Speed up some cmake builds
 ENV CMAKE_BUILD_PARALLEL_LEVEL=8
-
 
 # Add fetch_model helper
 ADD fetch_model.sh /usr/local/bin/fetch_model
@@ -74,6 +73,9 @@ CMD ["/start.sh"]
 # Stage 2: Download models
 FROM base as downloader
 
+# Model-specific ARGs moved here to preserve base layer caching
+ARG HUGGINGFACE_ACCESS_TOKEN
+ARG MODEL_TYPE
 
 # Add fetch_model helper
 ADD fetch_model_2.sh /usr/local/bin/fetch_model_2
