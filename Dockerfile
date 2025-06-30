@@ -82,7 +82,7 @@ RUN chmod +x /usr/local/bin/fetch_model_2
 WORKDIR /comfyui
 
 # Create necessary directories
-RUN mkdir -p models/checkpoints models/vae models/clip_vision models/diffusion_models models/text_encoders
+RUN mkdir -p models/checkpoints models/vae models/clip_vision models/diffusion_models models/text_encoders models/unet
 
 # Download checkpoints/vae/LoRA to include in image based on model type
 
@@ -140,7 +140,15 @@ fi
 
 # FLUX 1 - Dev
 RUN if [ "$MODEL_TYPE" = "flux1" ]; then \
-    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors" "unet/flux1-dev.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors" "diffusion_models/flux1-dev.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" "clip/clip_l.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors" "clip/t5xxl_fp8_e4m3fn.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
+    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors" "vae/ae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
+fi
+
+# FLUX 1 - Dev
+RUN if [ "$MODEL_TYPE" = "flux1-kontext" ]; then \
+    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev/resolve/main/flux1-kontext-dev.safetensors" "diffusion_models/flux1-kontext-dev.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
     fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" "clip/clip_l.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
     fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors" "clip/t5xxl_fp8_e4m3fn.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
     fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors" "vae/ae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \

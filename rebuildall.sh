@@ -35,6 +35,14 @@ DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
 
 DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-flux1
 
+echo "FLUX1-KONTEXT"
+DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
+  --build-arg MODEL_TYPE=flux1-kontext \
+  --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
+  -t gjbm2/runpod-worker-comfy:dev-flux1-kontext .
+
+DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-flux1
+
 echo "SD35"
 DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
   --build-arg MODEL_TYPE=sd35 \

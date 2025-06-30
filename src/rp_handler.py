@@ -33,7 +33,7 @@ REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 # --- WebSocket listener for ComfyUI progress (DEBUGGING only) ---
 async def listen_to_ws(stop_event, job_id, detailed_logging=True):
     comfy_uri = f"ws://{COMFY_HOST}/ws"
-    relay_uri = os.environ.get("BACKEND_WS_URL", "ws://185.254.136.253:8765/")
+    relay_uri = os.environ.get("BACKEND_WS_URL", "ws://185.254.136.244:8765/")
 
     try:
         async with websockets.connect(comfy_uri) as comfy_ws, \
