@@ -43,7 +43,8 @@ RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 RUN pip install comfy-cli
 
 # Install ComfyUI
-RUN /usr/bin/yes | comfy --workspace /comfyui install --cuda-version 11.8 --nvidia --version 0.3.29
+# RUN /usr/bin/yes | comfy --workspace /comfyui install --cuda-version 11.8 --nvidia --version 0.3.26   <-- worked previously (30Jun25)
+RUN /usr/bin/yes | comfy --workspace /comfyui install --cuda-version 11.8 --nvidia
 
 # Change working directory to ComfyUI
 WORKDIR /comfyui
@@ -113,9 +114,7 @@ RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
 fi
 
 RUN if [ "$MODEL_TYPE" = "wan2" ]; then \
-    #fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
-    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_flf2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
-    
+    fetch_model_2 "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "diffusion_models/wan2.1_i2v_720p_14B_fp16.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
     ls -lh models/diffusion_models/* && \
     sync; \
 fi
@@ -132,14 +131,6 @@ RUN if [ "$MODEL_TYPE" = "sd35" ]; then \
     fetch_model_2 "https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_l.safetensors" "clip/clip_l.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
 fi
 
-# FLUX 1 - Schnell
-RUN if [ "$MODEL_TYPE" = "flux1-schnell" ]; then \
-    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors" "unet/flux1-schnell.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
-    fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" "clip/clip_l.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
-    fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors" "clip/t5xxl_fp8_e4m3fn.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
-    fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors" "vae/ae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
-fi
-
 # FLUX 1 - Dev
 RUN if [ "$MODEL_TYPE" = "flux1" ]; then \
     fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors" "diffusion_models/flux1-dev.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
@@ -148,7 +139,7 @@ RUN if [ "$MODEL_TYPE" = "flux1" ]; then \
     fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors" "vae/ae.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
 fi
 
-# FLUX 1 - Dev
+# FLUX 1 - Kontext
 RUN if [ "$MODEL_TYPE" = "flux1-kontext" ]; then \
     fetch_model_2 "https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev/resolve/main/flux1-kontext-dev.safetensors" "diffusion_models/flux1-kontext-dev.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \
     fetch_model_2 "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" "clip/clip_l.safetensors" "$HUGGINGFACE_ACCESS_TOKEN" && \

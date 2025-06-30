@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+
+export DOCKER_BUILDKIT=1
 
 source .venv/bin/activate
 
@@ -11,14 +14,6 @@ set +o allexport
 
 bash start_model_server.sh
 
-echo "WAN2"
-DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
-  --build-arg MODEL_TYPE=wan2 \
-  --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
-  -t gjbm2/runpod-worker-comfy:dev-wan2 .
-
-DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-wan2
-
 echo "BASE"
 DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
   --build-arg MODEL_TYPE=base \
@@ -26,6 +21,14 @@ DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
   -t gjbm2/runpod-worker-comfy:dev-base .
 
 DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-base
+
+echo "WAN2"
+DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
+  --build-arg MODEL_TYPE=wan2 \
+  --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
+  -t gjbm2/runpod-worker-comfy:dev-wan2 .
+
+DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-wan2
 
 echo "FLUX1"
 DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
@@ -41,7 +44,7 @@ DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
   --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
   -t gjbm2/runpod-worker-comfy:dev-flux1-kontext .
 
-DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-flux1
+DOCKER_CONFIG="$HOME/.docker-wsl" docker push gjbm2/runpod-worker-comfy:dev-flux1-kontext
 
 echo "SD35"
 DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
