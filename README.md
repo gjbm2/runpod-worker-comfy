@@ -17,6 +17,7 @@
 - [Quickstart](#quickstart)
 - [Features](#features)
 - [Config](#config)
+  * [Environment Variables](#environment-variables)
   * [Upload image to AWS S3](#upload-image-to-aws-s3)
 - [Use the Docker image on RunPod](#use-the-docker-image-on-runpod)
   * [Create your template (optional)](#create-your-template-optional)
@@ -44,6 +45,9 @@
   * [Local API](#local-api)
     + [Access the local Worker API](#access-the-local-worker-api)
     + [Access local ComfyUI](#access-local-comfyui)
+- [Development and Build Scripts](#development-and-build-scripts)
+  * [rebuildall.sh](#rebuildallsh)
+  * [rebuildall_screen.sh](#rebuildall_screensh)
 - [Automatically deploy to Docker hub with GitHub Actions](#automatically-deploy-to-docker-hub-with-github-actions)
 - [Acknowledgments](#acknowledgments)
 
@@ -53,42 +57,54 @@
 
 ## Quickstart
 
-- 🐳 Choose one of the five available images for your serverless endpoint:
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-base`: doesn't contain anything, just a clean ComfyUI
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-flux1-schnell`: contains the checkpoint, text encoders and VAE for [FLUX.1 schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-flux1-dev`: contains the checkpoint, text encoders and VAE for [FLUX.1 dev](https://huggingface.co/black-forest-labs/FLUX.1-dev)
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-sdxl`: contains the checkpoint and VAE for [Stable Diffusion XL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-sd3`: contains the checkpoint for [Stable Diffusion 3 medium](https://huggingface.co/stabilityai/stable-diffusion-3-medium)
+- 🐳 Choose one of the available images for your serverless endpoint:
+  - `gjbm2/runpod-worker-comfy:dev-base`: Clean ComfyUI installation without pre-loaded models
+  - `gjbm2/runpod-worker-comfy:dev-sdxl`: Contains Stable Diffusion XL models
+  - `gjbm2/runpod-worker-comfy:dev-sd35`: Contains Stable Diffusion 3.5 Large models
+  - `gjbm2/runpod-worker-comfy:dev-flux1`: Contains FLUX.1 Dev models
+  - `gjbm2/runpod-worker-comfy:dev-flux1-kontext`: Contains FLUX.1 Kontext models
+  - `gjbm2/runpod-worker-comfy:dev-wan2`: Contains Wan 2.1 video generation models
 - ℹ️ [Use the Docker image on RunPod](#use-the-docker-image-on-runpod)
 - 🧪 Pick an [example workflow](./test_resources/workflows/) & [send it to your deployed endpoint](#interact-with-your-runpod-api)
 
 ## Features
 
-- Run any [ComfyUI](https://github.com/comfyanonymous/ComfyUI) workflow to generate an image
+- Run any [ComfyUI](https://github.com/comfyanonymous/ComfyUI) workflow to generate images or videos
 - Provide input images as base64-encoded string
-- The generated image is either:
+- The generated content is either:
   - Returned as base64-encoded string (default)
   - Uploaded to AWS S3 ([if AWS S3 is configured](#upload-image-to-aws-s3))
-- There are a few different Docker images to choose from:
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-flux1-schnell`: contains the [flux1-schnell.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell) checkpoint, the [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors) + [t5xxl_fp8_e4m3fn.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors) text encoders and [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors) VAE for FLUX.1-schnell
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-flux1-dev`: contains the [flux1-dev.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-dev) checkpoint, the [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors) + [t5xxl_fp8_e4m3fn.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors) text encoders and [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors) VAE for FLUX.1-dev
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-sdxl`: contains the checkpoints and VAE for Stable Diffusion XL
-    - Checkpoint: [sd_xl_base_1.0.safetensors](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
-    - VAEs:
-      - [sdxl_vae.safetensors](https://huggingface.co/stabilityai/sdxl-vae/)
-      - [sdxl-vae-fp16-fix](https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/)
-  - `timpietruskyblibla/runpod-worker-comfy:3.6.0-sd3`: contains the [sd3_medium_incl_clips_t5xxlfp8.safetensors](https://huggingface.co/stabilityai/stable-diffusion-3-medium) checkpoint for Stable Diffusion 3 medium
-- [Bring your own models](#bring-your-own-models)
+- **WebSocket Integration**: Real-time progress monitoring and logging with backend relay support
+- **Live Patching**: Automatic updates of handler and ComfyUI components during container startup
+- **AWS S3 Sync**: Automatic synchronization of models, custom nodes, and snapshots from S3
+- **Video Support**: Enhanced support for video generation workflows (MP4, WebM, WebP)
+- **Multiple Model Types**: Pre-built images with various AI models:
+  - **SDXL**: Stable Diffusion XL with optimized VAE
+  - **SD3.5**: Stable Diffusion 3.5 Large with text encoders
+  - **FLUX.1**: FLUX.1 Dev and Kontext variants
+  - **Wan 2.1**: Video generation models for image-to-video workflows
+- **Flexible Model Management**: Copy models from network volumes or sync from S3
+- **Enhanced Logging**: Detailed logging with configurable verbosity
+- **Worker Restart Control**: Programmatic worker restart with target worker selection
 - Based on [Ubuntu + NVIDIA CUDA](https://hub.docker.com/r/nvidia/cuda)
 
 ## Config
 
+### Environment Variables
+
 | Environment Variable        | Description                                                                                                                                                                           | Default  |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | `REFRESH_WORKER`            | When you want to stop the worker after each finished job to have a clean state, see [official documentation](https://docs.runpod.io/docs/handler-additional-controls#refresh-worker). | `false`  |
-| `COMFY_POLLING_INTERVAL_MS` | Time to wait between poll attempts in milliseconds.                                                                                                                                   | `250`    |
-| `COMFY_POLLING_MAX_RETRIES` | Maximum number of poll attempts. This should be increased the longer your workflow is running.                                                                                        | `500`    |
+| `COMFY_POLLING_INTERVAL_MS` | Time to wait between poll attempts in milliseconds.                                                                                                                                   | `1000`   |
+| `COMFY_POLLING_MAX_RETRIES` | Maximum number of poll attempts. This should be increased the longer your workflow is running.                                                                                        | `100000` |
 | `SERVE_API_LOCALLY`         | Enable local API server for development and testing. See [Local Testing](#local-testing) for more details.                                                                            | disabled |
+| `DETAILED_COMFY_LOGGING`    | Enable detailed logging for debugging and monitoring. Shows workflow inputs, WebSocket messages, and processing details.                                                              | `true`   |
+| `LIVE_PATCH`                | Enable automatic patching of rp_handler.py and ComfyUI components during container startup.                                                                                           | `false`  |
+| `AWS_SYNC`                  | Enable automatic synchronization of models, custom nodes, and snapshots from AWS S3.                                                                                                  | `false`  |
+| `COPY_MODELS`               | Copy models from network volume to local storage for improved performance.                                                                                                             | `false`  |
+| `COPY_SNAPSHOTS`            | Copy and restore ComfyUI snapshots from network volume.                                                                                                                                | `false`  |
+| `BACKEND_WS_URL`            | WebSocket URL for relaying ComfyUI progress messages to external backend.                                                                                                              | `ws://185.254.136.244:8765/` |
+| `COMFY_OUTPUT_PATH`         | Path where ComfyUI stores generated images and videos.                                                                                                                                 | `/comfyui/output` |
 
 ### Upload image to AWS S3
 
@@ -104,6 +120,7 @@ This is only needed if you want to upload the generated picture to AWS S3. If yo
 | `BUCKET_ENDPOINT_URL`      | The endpoint URL of your S3 bucket.                     | `https://<bucket>.s3.<region>.amazonaws.com` |
 | `BUCKET_ACCESS_KEY_ID`     | Your AWS access key ID for accessing the S3 bucket.     | `AKIAIOSFODNN7EXAMPLE`                       |
 | `BUCKET_SECRET_ACCESS_KEY` | Your AWS secret access key for accessing the S3 bucket. | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`   |
+| `BUCKET_AWS_REGION`        | AWS region for S3 bucket (used with AWS_SYNC).          | `us-east-1`                                  |
 
 ## Use the Docker image on RunPod
 
@@ -113,11 +130,10 @@ This is only needed if you want to upload the generated picture to AWS S3. If yo
 - In the dialog, configure:
   - Template Name: `runpod-worker-comfy` (it can be anything you want)
   - Template Type: serverless (change template type to "serverless")
-  - Container Image: `<dockerhub_username>/<repository_name>:tag`, in this case: `timpietruskyblibla/runpod-worker-comfy:3.6.0-sd3` (or `-base` for a clean image or `-sdxl` for Stable Diffusion XL or `-flex1-schnell` for FLUX.1 schnell)
+  - Container Image: `gjbm2/runpod-worker-comfy:dev-<model_type>` where `<model_type>` is one of: `base`, `sdxl`, `sd35`, `flux1`, `flux1-kontext`, `wan2`
   - Container Registry Credentials: You can leave everything as it is, as this repo is public
-  - Container Disk: `20 GB`
-  - (optional) Environment Variables: [Configure S3](#upload-image-to-aws-s3)
-    - Note: You can also not configure it, the images will then stay in the worker. In order to have them stored permanently, [we have to add the network volume](https://github.com/blib-la/runpod-worker-comfy/issues/1)
+  - Container Disk: `20 GB` (increase for larger models like FLUX.1 or Wan 2.1)
+  - (optional) Environment Variables: [Configure S3](#upload-image-to-aws-s3) and other options
 - Click on `Save Template`
 
 ### Create your endpoint
@@ -140,12 +156,14 @@ This is only needed if you want to upload the generated picture to AWS S3. If yo
 
 ### GPU recommendations
 
-| Model                     | Image           | Minimum VRAM Required | Container Size |
-| ------------------------- | --------------- | --------------------- | -------------- |
-| Stable Diffusion XL       | `sdxl`          | 8 GB                  | 15 GB          |
-| Stable Diffusion 3 Medium | `sd3`           | 5 GB                  | 20 GB          |
-| FLUX.1 Schnell            | `flux1-schnell` | 24 GB                 | 30 GB          |
-| FLUX.1 dev                | `flux1-dev`     | 24 GB                 | 30 GB          |
+| Model                     | Image           | Minimum VRAM Required | Container Size | Notes |
+| ------------------------- | --------------- | --------------------- | -------------- | ----- |
+| Base (no models)          | `dev-base`      | 4 GB                  | 10 GB          | For custom workflows |
+| Stable Diffusion XL       | `dev-sdxl`      | 8 GB                  | 15 GB          | Includes optimized VAE |
+| Stable Diffusion 3.5 Large| `dev-sd35`      | 12 GB                 | 20 GB          | Large text encoders |
+| FLUX.1 Dev                | `dev-flux1`     | 24 GB                 | 30 GB          | High VRAM requirement |
+| FLUX.1 Kontext            | `dev-flux1-kontext` | 24 GB             | 30 GB          | Context-aware variant |
+| Wan 2.1 (Video)           | `dev-wan2`      | 40 GB                 | 50 GB          | Video generation models |
 
 ## API specification
 
@@ -289,6 +307,7 @@ Using a Network Volume allows you to store and access custom models:
    - Use the Network Volume in your endpoint configuration:
      - Either create a new endpoint or update an existing one.
      - In the endpoint configuration, under `Advanced > Select Network Volume`, select your Network Volume.
+   - **Enable Model Copying**: Set `COPY_MODELS=true` to copy models from the network volume to local storage for better performance.
 
 Note: The folders in the Network Volume are automatically available to ComfyUI when the network volume is configured and attached.
 
@@ -304,7 +323,9 @@ If you prefer to include your models and custom nodes directly in the Docker ima
 To include additional models in your Docker image, edit the `Dockerfile` and add the download commands:
 
 ```Dockerfile
-RUN wget -O models/checkpoints/sd_xl_base_1.0.safetensors https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
+RUN if [ "$MODEL_TYPE" = "custom" ]; then \
+    fetch_model_2 "https://huggingface.co/your-model/resolve/main/model.safetensors" "checkpoints/model.safetensors" "$HUGGINGFACE_ACCESS_TOKEN"; \
+fi
 ```
 
 #### Adding Custom Nodes
@@ -327,8 +348,19 @@ To include custom nodes in your Docker image:
 
 #### Building the Image
 
-Build your customized Docker image locally:
+Use the provided build scripts to create your customized Docker images:
 
+**Using rebuildall.sh (builds all model types):**
+```bash
+bash rebuildall.sh
+```
+
+**Using rebuildall_screen.sh (builds in screen session with logging):**
+```bash
+bash rebuildall_screen.sh
+```
+
+**Manual build for specific model type:**
 ```bash
 # Build the base image
 docker build -t <your_dockerhub_username>/runpod-worker-comfy:dev-base --target base --platform linux/amd64 .
@@ -336,8 +368,8 @@ docker build -t <your_dockerhub_username>/runpod-worker-comfy:dev-base --target 
 # Build the SDXL image
 docker build --build-arg MODEL_TYPE=sdxl -t <your_dockerhub_username>/runpod-worker-comfy:dev-sdxl --platform linux/amd64 .
 
-# Build the SD3 image
-docker build --build-arg MODEL_TYPE=sd3 --build-arg HUGGINGFACE_ACCESS_TOKEN=<your-huggingface-token> -t <your_dockerhub_username>/runpod-worker-comfy:dev-sd3 --platform linux/amd64 .
+# Build the SD3.5 image
+docker build --build-arg MODEL_TYPE=sd35 --build-arg HUGGINGFACE_ACCESS_TOKEN=<your-huggingface-token> -t <your_dockerhub_username>/runpod-worker-comfy:dev-sd35 --platform linux/amd64 .
 ```
 
 > [!NOTE]  
@@ -366,6 +398,7 @@ Both tests will use the data from [test_input.json](./test_input.json), so make 
 4. Install the dependencies:
    ```bash
    pip install -r requirements.txt
+   pip install websockets  # For WebSocket functionality
    ```
 
 #### Setup for Windows
@@ -444,6 +477,52 @@ docker-compose up
 >
 > - Windows: Accessing the API or ComfyUI might not work when you run the Docker Image via WSL, so it is recommended to run the Docker Image directly on Windows using Docker Desktop
 
+## Development and Build Scripts
+
+### rebuildall.sh
+
+The main build script that creates Docker images for all supported model types:
+
+- **Base**: Clean ComfyUI without pre-loaded models
+- **SDXL**: Stable Diffusion XL with optimized VAE
+- **SD3.5**: Stable Diffusion 3.5 Large with text encoders
+- **FLUX.1**: FLUX.1 Dev models
+- **FLUX.1 Kontext**: FLUX.1 Kontext variant
+- **Wan 2.1**: Video generation models
+
+The script automatically:
+- Activates the virtual environment
+- Starts the model server for caching
+- Builds each image variant
+- Pushes to Docker Hub
+- Stops the model server
+
+### rebuildall_screen.sh
+
+Enhanced build script that runs the build process in a screen session with logging:
+
+- Creates timestamped log files in the `logs/` directory
+- Runs the build process in a detached screen session
+- Provides commands to monitor progress and attach to the session
+- Useful for long-running builds that you want to monitor remotely
+
+**Usage:**
+```bash
+bash rebuildall_screen.sh
+```
+
+**Monitor progress:**
+```bash
+# View the log file
+tail -f logs/rebuild_YYYYMMDD_HHMMSS.log
+
+# Attach to the screen session
+screen -r rebuild_session
+
+# Detach from session (while attached)
+Ctrl+A, then D
+```
+
 ## Automatically deploy to Docker hub with GitHub Actions
 
 The repo contains two workflows that publish the image to Docker hub using GitHub Actions:
@@ -463,7 +542,7 @@ And also make sure to add these **variables** to your repository:
 
 | Variable Name    | Description                                                  | Example Value         |
 | ---------------- | ------------------------------------------------------------ | --------------------- |
-| `DOCKERHUB_REPO` | The repository on Docker Hub where the image will be pushed. | `timpietruskyblibla`  |
+| `DOCKERHUB_REPO` | The repository on Docker Hub where the image will be pushed. | `gjbm2`               |
 | `DOCKERHUB_IMG`  | The name of the image to be pushed to Docker Hub.            | `runpod-worker-comfy` |
 
 ## Acknowledgments

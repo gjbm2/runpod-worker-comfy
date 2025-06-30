@@ -1,0 +1,34 @@
+# Build scripts
+rebuildall.sh
+retry-docker-push.sh
+push_race.sh
+
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+__pycache__
+*.pyc
+
+# Logs
+logs/
+
+# Docker
+docker-compose.yml
+docker-bake.hcl
+
+# Development files
+README.md
+CHANGELOG.md
+LICENSE
+.releaserc
+
+# Test files
+test_resources/
+tests/
+
+# Misc
+*.Zone.Identifier
+get-docker.sh 
