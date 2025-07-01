@@ -8,3 +8,4 @@ simulated_uploaded
 __pycache__
 *.log
 *.tmp
+logs/*
