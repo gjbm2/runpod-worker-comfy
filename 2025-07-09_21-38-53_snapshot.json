@@ -1,14 +1,6 @@
 {
     "comfyui": null,
     "git_custom_nodes": {
-        "https://github.com/kijai/ComfyUI-DepthAnythingV2": {
-            "hash": "9d7cb8c1e53b01744a75b599d3e91c93464a2d33",
-            "disabled": false
-        },
-        "https://github.com/bronkula/comfyui-fitsize": {
-            "hash": "dff0221df4859a6de4a7ef26d5a3900a153818e1",
-            "disabled": false
-        },
         "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation": {
             "hash": "7578205bd810cf96257b2e32d534b4513892af37",
             "disabled": false
@@ -17,14 +9,21 @@
             "hash": "df55f01d1df2f7bf5cc772294bc2e6d8bab22d66",
             "disabled": false
         },
+        "https://github.com/kijai/ComfyUI-DepthAnythingV2": {
+            "hash": "9d7cb8c1e53b01744a75b599d3e91c93464a2d33",
+            "disabled": true
+        },
+        "https://github.com/bronkula/comfyui-fitsize": {
+            "hash": "dff0221df4859a6de4a7ef26d5a3900a153818e1",
+            "disabled": false
+        },
         "https://github.com/cubiq/ComfyUI_IPAdapter_plus": {
             "hash": "9d076a3df0d2763cef5510ec5ab807f6632c39f5",
-            "disabled": false
+            "disabled": true
         }
     },
     "cnr_custom_nodes": {
         "comfyui-kjnodes": "1.0.7",
-        "comfyui_controlnet_aux": "1.1.0",
         "comfyui_essentials": "1.1.0"
     },
     "file_custom_nodes": [
@@ -57,8 +56,8 @@
         "colorama==0.4.6": "",
         "colorlog==6.9.0": "",
         "colour-science==0.4.6": "",
-        "comfyui-embedded-docs==0.2.3": "",
-        "comfyui_workflow_templates==0.1.30": "",
+        "comfyui-embedded-docs==0.2.4": "",
+        "comfyui_workflow_templates==0.1.35": "",
         "contourpy==1.3.1": "",
         "cryptography==44.0.0": "",
         "cssselect2==0.8.0": "",

@@ -14,7 +14,7 @@ attempt=1
 while true; do
   echo "Attempt $attempt: Pushing Docker image '$IMAGE'..."
   echo "Timestamp: $(date)"
-  docker push "$IMAGE" && {
+  docker push "$IMAGE" 2>&1 && {
     echo "✅ Push succeeded on attempt $attempt"
     echo "Success timestamp: $(date)"
     break

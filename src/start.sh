@@ -13,8 +13,8 @@ if [ "$LIVE_PATCH" == "true" ]; then
     # Get laetest rp_handler script
     wget -O /rp_handler.py "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/rp_handler.py?$(date +%s%N)" 
     wget -O /comfyui/extra_model_paths.yaml "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/main/src/extra_model_paths.yaml?$(date +%s%N)" 
-    wget -O /restore_snapshots.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
-    chmod +x /restore_snapshots.sh
+    wget -O /restore_snapshot.sh "https://raw.githubusercontent.com/gjbm2/runpod-worker-comfy/refs/heads/main/src/restore_snapshot.sh?$(date +%s%N)" 
+    chmod +x /restore_snapshot.sh
 
     pushd "$(pwd)" > /dev/null
     
@@ -65,7 +65,7 @@ if [ "$COPY_SNAPSHOTS" == "true" ]; then
     cp -v -u /runpod-volume/snapshots/* /
     # Try to restore nodes
     # apt update && apt install -y libglib2.0-0        # TEMP UNTIL WE HAVE RE-ROLLED CONTAINER
-    /restore_snapshots.sh
+    /restore_snapshot.sh
     
     # pull in custom nodes
     # ln -sf /runpod-volume/custom_nodes/* /comfyui/custom_nodes 
@@ -74,6 +74,8 @@ fi
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
+
+
 
 echo 
 echo "== INIT COMPLETE =="

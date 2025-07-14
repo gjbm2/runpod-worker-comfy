@@ -1,4 +1,4 @@
-# Build scripts
+## Build scripts
 rebuildall.sh
 rebuildall_parallel.sh
 retry-docker-push.sh
@@ -33,3 +33,4 @@ tests/
 # Misc
 *.Zone.Identifier
 get-docker.sh 
+*.md

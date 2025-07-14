@@ -106,6 +106,45 @@
 | `BACKEND_WS_URL`            | WebSocket URL for relaying ComfyUI progress messages to external backend.                                                                                                              | `ws://185.254.136.244:8765/` |
 | `COMFY_OUTPUT_PATH`         | Path where ComfyUI stores generated images and videos.                                                                                                                                 | `/comfyui/output` |
 
+### Performance Optimization Variables
+
+| Environment Variable | Description | Default |
+| --- | --- | --- |
+| `REFRESH_WORKER` | Set to `false` to keep workers alive for reuse (RunPod handles reuse automatically) | `false` |
+
+### Worker Reuse Strategy
+
+**RunPod serverless automatically reuses workers** when they're available within the idle timeout period.
+
+**For optimal performance:**
+
+1. **Set `REFRESH_WORKER=false`** to keep workers alive after job completion
+2. **Use batch processing** to maximize worker reuse
+3. **No client-side changes needed** - RunPod infrastructure handles worker selection automatically
+
+**Performance Benefits:**
+- **Cold Start**: ~11 seconds (models load from disk)
+- **Warm Start**: ~2-3 seconds (models already in GPU memory)
+- **Improvement**: 70-80% faster for subsequent jobs
+
+### Custom Node Optimization
+
+Based on workflow analysis, the following custom nodes are **installed but unused** and can be removed to reduce startup time:
+
+**Unused Custom Nodes:**
+- `ComfyUI-DepthAnythingV2` - Depth estimation nodes
+- `comfyui-fitsize` - Image resizing utilities  
+- `ComfyUI_IPAdapter_plus` - IP-Adapter integration
+- `comfyui-kjnodes` - Various utility nodes
+- `comfyui_controlnet_aux` - ControlNet auxiliary nodes (has dependency issues)
+
+**Used Custom Nodes (keep these):**
+- `comfyui_essentials` - Provides upscaling and image resize nodes
+- `ComfyUI-VideoHelperSuite` - Video processing nodes
+- `ComfyUI-Frame-Interpolation` - Frame interpolation for videos
+
+To remove unused nodes, edit the snapshot file and remove the corresponding entries from `git_custom_nodes` and `cnr_custom_nodes` sections.
+
 ### Upload image to AWS S3
 
 This is only needed if you want to upload the generated picture to AWS S3. If you don't configure this, your image will be exported as base64-encoded string.

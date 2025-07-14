@@ -143,9 +143,13 @@ else
     BASE_NEEDS_BUILD=true
     BASE_NEEDS_PUSH=true
     log_and_echo "Building BASE image..."
+    # Pull cache images (ignore failures for first build)
+    DOCKER_CONFIG="$HOME/.docker-wsl" docker pull gjbm2/runpod-worker-comfy:dev-base || true
     if DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
       --build-arg MODEL_TYPE=base \
       --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
+      --build-arg BUILDKIT_INLINE_CACHE=1 \
+      --cache-from=gjbm2/runpod-worker-comfy:dev-base \
       -t gjbm2/runpod-worker-comfy:dev-base . 2>&1 | tee -a logs/base_build.log; then
       log_and_echo "BASE build completed successfully"
     else
@@ -242,7 +246,7 @@ else
       fi
       
       # Give tmux a moment to create the pane
-      sleep 0.5
+      sleep 1
     fi
     
     # Build→Push pipeline in background
@@ -250,9 +254,15 @@ else
       echo "=== STARTING $name BUILD ===" >> "logs/${name,,}_pipeline.log"
       echo "Building $name image..." >> "logs/${name,,}_pipeline.log"
       
+      # Pull cache images (ignore failures for first build)
+      echo "Pulling cache images..." >> "logs/${name,,}_pipeline.log"
+      DOCKER_CONFIG="$HOME/.docker-wsl" docker pull "$image_tag" >> "logs/${name,,}_pipeline.log" 2>&1 || true
+      
       if DOCKER_CONFIG="$HOME/.docker-wsl" docker build \
         --build-arg MODEL_TYPE="$model_type" \
         --build-arg HUGGINGFACE_ACCESS_TOKEN="${HUGGINGFACE_ACCESS_TOKEN}" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --cache-from="$image_tag" \
         -t "$image_tag" . >> "logs/${name,,}_pipeline.log" 2>&1; then
         
         echo "✅ $name build completed successfully" >> "logs/${name,,}_pipeline.log"
